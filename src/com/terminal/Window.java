@@ -4,8 +4,6 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Window
 {
@@ -18,82 +16,48 @@ public class Window
 
     public Window(int rows, int columns, int stackSize)
     {
-
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
         port.setLayout(new GridLayout(rows, columns));
 
-        for (int i = 0; i < columns; i++) {
-
-            List<JPanel> jPanelList = new ArrayList();
-            for (int j = 0; j < rows; j++){
-                JPanel jPanel = new JPanel();
-                jPanel.setBorder(blackline);
-
-                //add panel
-                int colInRegion = 1;
-
-                jPanel.setLayout(new GridLayout(stackSize, colInRegion));
-                for (int k = 0; k < colInRegion; k++){
-                    for (int l = 0; l < stackSize; l++){
-                        JTextField jTextField = new JTextField();
-                        jPanel.add(jTextField);
-                    }
-                }
-
-                jPanelList.add(jPanel);
-                port.add(jPanelList.get(j));
-            }
-        }
-
-        Component[] children = port.getComponents();
-        // iterate over all subPanels...
-        int i = 0;
-        for (Component spChild : children)
+        for (int r = 0; r < columns; r++)
         {
-            if (spChild instanceof JPanel)
+            for (int c = 0; c < rows; c++)
             {
-                JPanel jPanel = ((JPanel)spChild);
+                JPanel cell = new JPanel();
+                cell.setBorder(blackline);
 
-                Component[] childrenJtext = jPanel.getComponents();
-                int j = 0;
-                // now iterate over all JTextFields...
-                for (Component spJTChild : childrenJtext)
-                {
-                    if (spJTChild instanceof JTextField)
-                    {
-                        JTextField jTextField = ((JTextField)spJTChild);
-                        jTextField.setText("Test: "+ i + j);
-                        j  = j+1;
-                    }
-                }
+                cell.setLayout(new GridLayout(stackSize, 1));
+                for (int s = 0; s < stackSize; s++)
+                    cell.add(new JTextField());
 
-                System.out.println(i);
-
-                i  = i+1;
+                port.add(cell);
             }
         }
 
-//        JTextField test2[] = new JTextField[rows];
-//        JTextField test3[] = new JTextField[rows];
-//        JTextField test4[] = new JTextField[rows];
-//        JTextField test5[] = new JTextField[rows];
-//        for (int i = 0; i < rows; i++)
-//        {
-//            test1[i] = new JTextField();
-//            test2[i] = new JTextField();
-//            test3[i] = new JTextField();
-//            test4[i] = new JTextField();
-//            test5[i] = new JTextField();
-//            mainPanel.add(test1[i]);
-//            mainPanel.add(test2[i]);
-//            mainPanel.add(test3[i]);
-//            mainPanel.add(test4[i]);
-//            mainPanel.add(test5[i]);
-//        }
+        Component[] cells = port.getComponents();
+        // iterate over cells...
+        int i = 0;
+        for (Component cellComponent : cells)
+        {
+            JPanel cell = ((JPanel)cellComponent);
+            Component[] stacks = cell.getComponents();
 
+            // iterate over stacks...
+            int j = 0;
+            for (Component stackComponent : stacks)
+            {
+                JTextField stack = ((JTextField)stackComponent);
+                stack.setText("Test: "+ i + j);
+                ++j;
+            }
 
-        drop.addActionListener(new ActionListener() {
+            ++i;
+        }
+
+        // TODO: Change to behaviour listening from cellAgent and changing Gui accordingly
+        drop.addActionListener(new ActionListener()
+        {
             @Override
             public void actionPerformed(ActionEvent e)
             {
