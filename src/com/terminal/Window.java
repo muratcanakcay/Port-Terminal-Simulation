@@ -30,6 +30,7 @@ public class Window
 
                 //add panel
                 int colInRegion = 1;
+
                 jPanel.setLayout(new GridLayout(stackSize, colInRegion));
                 for (int k = 0; k < colInRegion; k++){
                     for (int l = 0; l < stackSize; l++){
