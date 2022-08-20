@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainFrame
+public class Window
 {
     public  JPanel mainPanel;
     private JTextField destination;
@@ -14,32 +14,28 @@ public class MainFrame
     private JButton drop;
     private JLabel Jlabel2;
 
-    public MainFrame()
+    public Window(int rows, int columns, int stackSize)
     {
 
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
-        int noOfFields = 4;
-        int col = 3;
-        port.setLayout(new GridLayout(noOfFields, col));
+        port.setLayout(new GridLayout(rows, columns));
 
-        for (int i = 0; i < col; i++) {
+        for (int i = 0; i < columns; i++) {
 
             List<JPanel> jPanelList = new ArrayList();
-            for (int j = 0; j < noOfFields; j++){
+            for (int j = 0; j < rows; j++){
                 JPanel jPanel = new JPanel();
                 jPanel.setBorder(blackline);
 
                 //add panel
-                int noOfCells = 5;
                 int colInRegion = 1;
-                jPanel.setLayout(new GridLayout(noOfCells,colInRegion));
+                jPanel.setLayout(new GridLayout(stackSize, colInRegion));
                 for (int k = 0; k < colInRegion; k++){
-                    for (int l = 0; l < noOfCells; l++){
+                    for (int l = 0; l < stackSize; l++){
                         JTextField jTextField = new JTextField();
                         jPanel.add(jTextField);
                     }
-
                 }
 
                 jPanelList.add(jPanel);
@@ -76,11 +72,11 @@ public class MainFrame
             }
         }
 
-//        JTextField test2[] = new JTextField[noOfFields];
-//        JTextField test3[] = new JTextField[noOfFields];
-//        JTextField test4[] = new JTextField[noOfFields];
-//        JTextField test5[] = new JTextField[noOfFields];
-//        for (int i = 0; i < noOfFields; i++)
+//        JTextField test2[] = new JTextField[rows];
+//        JTextField test3[] = new JTextField[rows];
+//        JTextField test4[] = new JTextField[rows];
+//        JTextField test5[] = new JTextField[rows];
+//        for (int i = 0; i < rows; i++)
 //        {
 //            test1[i] = new JTextField();
 //            test2[i] = new JTextField();
