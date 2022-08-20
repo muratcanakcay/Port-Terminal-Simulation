@@ -4,13 +4,21 @@ import javax.swing.*;
 
 public class GuiAgent extends Agent
 {
+    int rows;
+    int columns;
+    int stackSize;
+
     @Override
     protected void setup()
     {
         Object[] PortArgs = getArguments();
+        rows = Integer.parseInt((String)PortArgs[0]);
+        columns = Integer.parseInt((String)PortArgs[1]);
+        stackSize = Integer.parseInt((String)PortArgs[2]);
+
         JFrame jFrame = new JFrame("Main Panel");
-        jFrame.setContentPane(new Window(Integer.parseInt((String)PortArgs[0]), Integer.parseInt((String)PortArgs[1]), Integer.parseInt((String)PortArgs[2])).mainPanel);
-        jFrame.setTitle("Port Terminal Problem");
+        jFrame.setContentPane(new Window(rows, columns, stackSize).mainPanel);
+        jFrame.setTitle("Port Terminal Simulation");
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.pack();
         jFrame.setVisible(true);

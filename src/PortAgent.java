@@ -1,5 +1,4 @@
 import jade.core.Agent;
-import javax.swing.*;
 
 public class PortAgent extends Agent
 {
