@@ -2,6 +2,8 @@ package com.terminal;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +46,6 @@ public class Window
             }
         }
 
-        List<JTextField> test2 = new ArrayList();
         Component[] children = port.getComponents();
         // iterate over all subPanels...
         int i = 0;
@@ -92,16 +93,21 @@ public class Window
 //        }
 
 
-   }
+        drop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                int r = 1;
+                int c = 2;
 
-//    public static void main(String[] args)
-//    {
-//
-//        JFrame jFrame = new JFrame("Main Panel");
-//        jFrame.setContentPane(new MainFrame().mainPanel);
-//        jFrame.setTitle("Port Terminal Problem");
-//        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        jFrame.pack();
-//        jFrame.setVisible(true);
-//    }
+                Component[] panels = port.getComponents();
+                JPanel panel = ((JPanel)panels[r*columns + c]);
+
+                Component[] stacks = panel.getComponents();
+                JTextField stack = ((JTextField)stacks[2]);
+
+                stack.setText("Changed");
+            }
+        });
+    }
 }
