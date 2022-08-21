@@ -32,7 +32,7 @@ public class PortAgent extends Agent
                 for (int c = 0; c < columns; ++c)
                 {
                     Object[] CellArgs = {String.valueOf(r), String.valueOf(c), String.valueOf(port.getStackSize())};
-                    AgentController Cell = ac.createNewAgent("CellAgent(" + r + "," + c + ")", "CellAgent", CellArgs);
+                    AgentController Cell = ac.createNewAgent("Cell" + r + ":" + c, "CellAgent", CellArgs);
                     Cell.start();
                 }
             }

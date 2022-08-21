@@ -1,5 +1,4 @@
 import classes.AgentUtils;
-import classes.Utils;
 import classes.Utils.Clock;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -19,7 +18,7 @@ public class MainAgent extends Agent
         AgentUtils.registerToDF(this, getAID(), "MainAgent", "MainAgent");
 
         // start the clock
-        Clock clock = new Clock();
+        Clock clock = new Clock(simulationSpeed);
 
         AgentContainer ac = getContainerController();
 
@@ -27,8 +26,10 @@ public class MainAgent extends Agent
         {
             AgentController Gui = ac.createNewAgent("GuiAgent", "GuiAgent", PortArgs);
             AgentController Port = ac.createNewAgent("PortAgent", "PortAgent", PortArgs);
+            AgentController Ship = ac.createNewAgent("Ship001", "ShipAgent", new Object[]{"001", "5", "10"});
             Gui.start();
             Port.start();
+            Ship.start();
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -43,7 +44,7 @@ public class MainAgent extends Agent
         public void onTick()
         {
             Clock.tick();
-            System.out.println("[MainAgent] Simulation Time: " + Utils.Clock.GetSimulationTime());
+            System.out.println("[MainAgent] Simulation Time: " + Clock.GetSimulationTime());
         }
     };
 }

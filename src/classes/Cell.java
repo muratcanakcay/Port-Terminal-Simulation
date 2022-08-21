@@ -6,7 +6,7 @@ public class Cell
     private final int column;               // which column the cell is located at
     private final int stackSize;            // stackSize of the cell -- MAY BE UNNECESSARY TO STORE HERE
     private final String name;              // name of the cell
-    private final Container[] containers;   // containers stacked in the cell
+    private final Container[] containers;   // containers stacked in the cell -- MAYBE Stack<Container> ?
 
 
     public Cell(int row, int column, int stackSize)

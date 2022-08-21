@@ -9,10 +9,10 @@ public class CellAgent extends Agent
     @Override
     protected void setup()
     {
-        Object[] PortArgs = getArguments();
-        int row = Integer.parseInt((String)PortArgs[0]);
-        int column = Integer.parseInt((String)PortArgs[1]);
-        int stackSize = Integer.parseInt((String)PortArgs[2]);
+        Object[] CellArgs = getArguments();
+        int row = Integer.parseInt((String)CellArgs[0]);
+        int column = Integer.parseInt((String)CellArgs[1]);
+        int stackSize = Integer.parseInt((String)CellArgs[2]);
         cell = new Cell(row, column, stackSize);
 
         // the Agent registers itself to DF
