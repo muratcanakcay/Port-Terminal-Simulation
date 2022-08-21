@@ -1,6 +1,5 @@
 import classes.AgentUtils;
 import classes.Port;
-import classes.Utils;
 import jade.core.Agent;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
@@ -22,7 +21,6 @@ public class PortAgent extends Agent
         port = new Port(rows, columns, stackSize);
 
         System.out.println("[PortAgent] Rows: " + port.getRows() + " Columns: " + port.getColumns() + " StackSize: " + port.getStackSize());
-        System.out.println("[PortAgent] Simulation Speed: " + Utils.Clock.GetSimulationSpeed());
 
         AgentContainer ac = getContainerController();
 

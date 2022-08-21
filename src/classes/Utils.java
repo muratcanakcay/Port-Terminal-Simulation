@@ -1,31 +1,19 @@
 package classes;
 
-import java.time.Instant;
-
 public class Utils
 {
     public static class Clock
     {
-        private static long startTime;
-        private static int  simulationSpeed;
+        private static int currentTime = 0;
 
-        public Clock(int simulationSpeed_)
+        public static int GetSimulationTime()
         {
-            startTime = Instant.now().getEpochSecond();
-            simulationSpeed = simulationSpeed_;
+            return currentTime;
         }
 
-        public static void GetSimulationTime()
+        public static void  tick()
         {
-            System.out.println("Start: " + startTime);
-            long ut = System.currentTimeMillis() / 1000L;
-            System.out.println("Now: " + ut);
-            System.out.println("Passed: " + ((ut-startTime) * simulationSpeed));
-        }
-
-        public static int GetSimulationSpeed()
-        {
-            return simulationSpeed;
+            ++currentTime;
         }
     }
 
