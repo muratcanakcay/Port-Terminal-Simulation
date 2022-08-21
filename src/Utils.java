@@ -1,10 +1,5 @@
-package com.terminal;
-
-public class Utils {
-
-    public Utils() {
-    }
-
+public class Utils
+{
     public int countOccurences(
             String someString, char searchedChar) {
 

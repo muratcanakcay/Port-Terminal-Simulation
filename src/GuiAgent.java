@@ -1,10 +1,4 @@
-import com.terminal.Window;
 import jade.core.Agent;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
-
 import javax.swing.*;
 
 public class GuiAgent extends Agent
@@ -17,18 +11,7 @@ public class GuiAgent extends Agent
     protected void setup()
     {
         // the Agent registers itself to DF
-        DFAgentDescription dfd = new DFAgentDescription();
-        dfd.setName(getAID());
-
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType("Gui");
-        sd.setName("GuiAgent");
-        dfd.addServices(sd);
-        try {
-            DFService.register(this, dfd);
-        } catch (FIPAException fe) {
-            fe.printStackTrace();
-        }
+        AgentUtils.registerToDF(this, getAID(), "GuiAgent", "GuiAgent");
 
         Object[] PortArgs = getArguments();
         rows = Integer.parseInt((String)PortArgs[0]);
@@ -42,4 +25,6 @@ public class GuiAgent extends Agent
         jFrame.pack();
         jFrame.setVisible(true);
     }
+
+
 }

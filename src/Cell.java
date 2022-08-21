@@ -1,7 +1,3 @@
-package com.terminal;
-
-import java.util.ArrayList;
-
 public class Cell {
 
     private String containers;

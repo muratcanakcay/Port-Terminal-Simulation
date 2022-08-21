@@ -1,5 +1,3 @@
-package com.terminal;
-
 import java.util.ArrayList;
 
 public class Container {
