@@ -4,9 +4,9 @@ import javax.swing.*;
 
 public class GuiAgent extends Agent
 {
-    int rows;
-    int columns;
-    int stackSize;
+    private int rows;
+    private int columns;
+    private int stackSize;
 
     @Override
     protected void setup()

@@ -4,7 +4,7 @@ import jade.core.Agent;
 
 public class CellAgent extends Agent
 {
-    Cell cell;
+    private Cell cell;
 
     @Override
     protected void setup()
