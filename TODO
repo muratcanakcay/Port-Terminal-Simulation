@@ -1,11 +1,10 @@
 MainAgent creates PortAgent with (r, c, s)
---> PortAgent creates rxc cellAgents, tells them their r,c and s
+--> [DONE] PortAgent creates rxc cellAgents, tells them their r,c and s
 --> PortAgent creates craneAgents
 --> PortAgent starts listening for ShipAgents
 
-
+MainAgent creates ShipAgent with (???)
 ShipAgent informs PortAgent of arrival time
-
 
 ShipAgent informs PortAgent of arrival
 --> PortAgent creates UnloadAgent(?) for each ship
