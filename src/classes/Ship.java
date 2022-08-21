@@ -1,23 +1,22 @@
 package classes;
 
-import java.util.Stack;
-
 public class Ship
 {
     int arrivalTime;
     int departureTime;
     String name;
-    Stack<Container> containers = new Stack<>();
+    Container[] containers;
 
-    public Ship(String no_, int arrivalTime_, int departureTime_)
+    public Ship(String shipName_, int arrivalTime_, int departureTime_, Container[] containers_)
     {
         arrivalTime = arrivalTime_;
         departureTime = departureTime_;
-        name = "Ship" + no_;
+        name = shipName_;
+        containers = containers_;
     }
 
     public String getName() { return name; }
     public int getArrivalTime() { return arrivalTime; }
     public int getDepartureTime() { return departureTime; }
-    // public Container[] getContainers() { return containers; }
+    public Container[] getContainers() { return containers; }
 }

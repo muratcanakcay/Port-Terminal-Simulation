@@ -14,7 +14,7 @@ public class Cell
         this.row = row;
         this.column = column;
         this.stackSize = stackSize;
-        name = "CellAgent(" + row + "," + column + ")";
+        name = "Cell" + row + ":" + column;
         containers = new Container[stackSize];
     }
 

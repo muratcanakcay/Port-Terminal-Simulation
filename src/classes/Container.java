@@ -1,17 +1,16 @@
 package classes;
 
 // TODO: implement container class properly
-public class Container {
+public class Container
+{
 
     private String destination;
-    private String name;
+    private final String name;
 
-    public Container(String destination, String name) {
+    public Container(String name, String destination)
+    {
         this.destination = destination;
         this.name = name;
-    }
-
-    public Container() {
     }
 
     public String getDestination() {
@@ -26,7 +25,5 @@ public class Container {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+
 }

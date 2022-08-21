@@ -1,4 +1,5 @@
 import classes.AgentUtils;
+import classes.Container;
 import classes.Ship;
 import classes.Utils.Clock;
 import jade.core.Agent;
@@ -14,13 +15,15 @@ public class ShipAgent extends Agent
     protected void setup()
     {
         Object[] ShipArgs = getArguments();
-        String no = (String)ShipArgs[0];
+        String shipName = "Ship" + ShipArgs[0];
         int arrivalTime = Integer.parseInt((String)ShipArgs[1]);
         int departureTime = Integer.parseInt((String)ShipArgs[2]);
-        ship = new Ship(no, arrivalTime, departureTime);
+        Container[] containers = (Container[])ShipArgs[3];
+
+        ship = new Ship(shipName, arrivalTime, departureTime, containers);
 
         // the Agent registers itself to DF
-        AgentUtils.registerToDF(this, getAID(), "ShipAgent", "Ship" + no);
+        AgentUtils.registerToDF(this, getAID(), "ShipAgent", shipName);
 
         System.out.printf("[%s] Agent is registered to DF.\n", ship.getName());
 
@@ -48,7 +51,14 @@ public class ShipAgent extends Agent
         @Override
         public void action()
         {
-            System.out.printf("[%s] Arrived at port!\n", ship.getName());
+            System.out.printf("[%s] Arrived at port! Containers on board:\n", ship.getName());
+
+
+            // print container list
+            for (Container container : ship.getContainers())
+            {
+                System.out.println(container.getName());
+            }
         }
     };
 

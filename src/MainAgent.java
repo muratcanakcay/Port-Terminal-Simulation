@@ -1,10 +1,13 @@
 import classes.AgentUtils;
+import classes.Container;
 import classes.Utils.Clock;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
+
+import static java.util.UUID.randomUUID;
 
 public class MainAgent extends Agent
 {
@@ -26,9 +29,22 @@ public class MainAgent extends Agent
         {
             AgentController Gui = ac.createNewAgent("GuiAgent", "GuiAgent", PortArgs);
             AgentController Port = ac.createNewAgent("PortAgent", "PortAgent", PortArgs);
-            AgentController Ship = ac.createNewAgent("Ship001", "ShipAgent", new Object[]{"001", "5", "10"});
             Gui.start();
             Port.start();
+
+            // create 3 containers to add to ship
+            Container[] containers = new Container[3];
+            for (int i = 0; i < 3; i++)
+            {
+                String containerName = String.valueOf(randomUUID());
+                Container container = new Container(containerName, "Neverland");
+                containers[i] = container;
+                AgentController Container = ac.createNewAgent(containerName, "ContainerAgent", new Object[]{container});
+                Container.start();
+            }
+
+            // TODO: implement a method to add a new ship with incremental ship number
+            AgentController Ship = ac.createNewAgent("Ship001", "ShipAgent", new Object[]{"001", "5", "10", containers});
             Ship.start();
         }
         catch (Exception e) {
@@ -44,7 +60,7 @@ public class MainAgent extends Agent
         public void onTick()
         {
             Clock.tick();
-            System.out.println("[MainAgent] Simulation Time: " + Clock.GetSimulationTime());
+            //System.out.println("[MainAgent] Simulation Time: " + Clock.GetSimulationTime());
         }
     };
 }
