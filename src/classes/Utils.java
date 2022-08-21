@@ -1,3 +1,5 @@
+package classes;
+
 public class Utils
 {
     public int countOccurences(

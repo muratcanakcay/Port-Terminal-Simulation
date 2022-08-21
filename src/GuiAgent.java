@@ -1,3 +1,4 @@
+import classes.AgentUtils;
 import jade.core.Agent;
 import javax.swing.*;
 
@@ -18,6 +19,7 @@ public class GuiAgent extends Agent
         columns = Integer.parseInt((String)PortArgs[1]);
         stackSize = Integer.parseInt((String)PortArgs[2]);
 
+        // Create the GUI Window
         JFrame jFrame = new JFrame("Main Panel");
         jFrame.setContentPane(new Window(rows, columns, stackSize).mainPanel);
         jFrame.setTitle("Port Terminal Simulation");

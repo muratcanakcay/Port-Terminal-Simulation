@@ -1,3 +1,4 @@
+import classes.AgentUtils;
 import jade.core.Agent;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
@@ -19,10 +20,11 @@ public class PortAgent extends Agent
         columns = Integer.parseInt((String)PortArgs[1]);
         stackSize = Integer.parseInt((String)PortArgs[2]);
 
-        System.out.println("[PORTAGENT] Rows: " + rows + " Columns: " + columns + " StackSize: " + stackSize);
+        System.out.println("[PortAgent] Rows: " + rows + " Columns: " + columns + " StackSize: " + stackSize);
 
         AgentContainer ac = getContainerController();
 
+        // Create the cell agents of the container storage
         try
         {
             for (int r = 0; r < rows; ++r)
@@ -38,7 +40,5 @@ public class PortAgent extends Agent
         catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 }

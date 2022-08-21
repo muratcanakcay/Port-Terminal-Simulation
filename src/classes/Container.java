@@ -1,5 +1,6 @@
-import java.util.ArrayList;
+package classes;
 
+// TODO: implement container class properly
 public class Container {
 
     private String destination;
