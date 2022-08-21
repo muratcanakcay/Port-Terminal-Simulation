@@ -1,4 +1,6 @@
 import jade.core.Agent;
+import jade.wrapper.AgentContainer;
+import jade.wrapper.AgentController;
 
 public class PortAgent extends Agent
 {
@@ -9,6 +11,9 @@ public class PortAgent extends Agent
     @Override
     protected void setup()
     {
+        // the Agent registers itself to DF
+        AgentUtils.registerToDF(this, getAID(), "PortAgent", "PortAgent");
+
         Object[] PortArgs = getArguments();
         rows = Integer.parseInt((String)PortArgs[0]);
         columns = Integer.parseInt((String)PortArgs[1]);
@@ -16,7 +21,24 @@ public class PortAgent extends Agent
 
         System.out.println("[PORTAGENT] Rows: " + rows + " Columns: " + columns + " StackSize: " + stackSize);
 
-        // the Agent registers itself to DF
-        AgentUtils.registerToDF(this, getAID(), "PortAgent", "PortAgent");
+        AgentContainer ac = getContainerController();
+
+        try
+        {
+            for (int r = 0; r < rows; ++r)
+            {
+                for (int c = 0; c < columns; ++c)
+                {
+                    Object[] CellArgs = {String.valueOf(r), String.valueOf(c), String.valueOf(stackSize)};
+                    AgentController Cell = ac.createNewAgent("CellAgent(" + r + "," + c + ")", "CellAgent", CellArgs);
+                    Cell.start();
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 }
