@@ -4,6 +4,8 @@ import jade.core.Agent;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 
+import static classes.AgentUtils.searchDF;
+
 public class PortAgent extends Agent
 {
     private Port port;
@@ -13,6 +15,10 @@ public class PortAgent extends Agent
     {
         // the Agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "PortAgent", "PortAgent");
+
+        // get the GuiAgent AID from DF
+        jade.core.AID GuiAgent = searchDF(this, "GuiAgent", "GuiAgent")[0].getName();
+        System.out.println("[PortAgent] Received GuiAgent from DF: " + GuiAgent.toString());
 
         Object[] PortArgs = getArguments();
         int rows = Integer.parseInt((String)PortArgs[0]);
