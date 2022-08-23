@@ -1,5 +1,10 @@
 import classes.AgentUtils;
+import classes.Utils;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.lang.acl.ACLMessage;
+
 import javax.swing.*;
 
 public class GuiAgent extends Agent
@@ -26,7 +31,37 @@ public class GuiAgent extends Agent
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.pack();
         jFrame.setVisible(true);
+
+        addBehaviour(ReceiveMessages);
     }
 
+    Behaviour ReceiveMessages = new CyclicBehaviour(this) {
+        @Override
+        public void action()
+        {
+            ACLMessage msg = receive();
 
+            if (msg != null)
+            {
+                switch(msg.getOntology())
+                {
+                    case "ConsoleLog":
+                        System.out.println(getAID().getName() + " received log: " + msg.getContent());
+
+//                        ACLMessage response = msg.createReply();
+//                        response.setPerformative(ACLMessage.INFORM);
+//                        response.setContent("Today it's raining.");
+//                        System.out.println(getAID().getName() + " is sending response message!");
+//                        send(response);
+                        break;
+                }
+            }
+
+            try {
+                Thread.sleep(500 / Utils.Clock.GetSimulationSpeed()); // TODO: optimize sleep duration to ensure good messaging
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    };
 }

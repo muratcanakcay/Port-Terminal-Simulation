@@ -27,12 +27,21 @@ public class MainAgent extends Agent
 
         try
         {
+            // start GuiAgent
             AgentController Gui = ac.createNewAgent("GuiAgent", "GuiAgent", PortArgs);
-            AgentController Port = ac.createNewAgent("PortAgent", "PortAgent", PortArgs);
             Gui.start();
+
+            // wait for Gui to start // TODO: may need more time to start!
+            Thread.sleep(3000);
+
+            // initialize AgentUtils.Gui for global use
+            AgentUtils.Gui gui = new AgentUtils.Gui(this);
+
+            // start PortAgent
+            AgentController Port = ac.createNewAgent("PortAgent", "PortAgent", PortArgs);
             Port.start();
 
-            // create 3 containers to add to ship
+            // create 3 sample containers to add to ship
             Container[] containers = new Container[3];
             for (int i = 0; i < 3; i++)
             {
@@ -60,7 +69,7 @@ public class MainAgent extends Agent
         public void onTick()
         {
             Clock.tick();
-            //System.out.println("[MainAgent] Simulation Time: " + Clock.GetSimulationTime());
+            // System.out.println("[MainAgent] Simulation Time: " + Clock.GetSimulationTime());
         }
     };
 }
