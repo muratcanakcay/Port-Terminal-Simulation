@@ -9,6 +9,8 @@ import javax.swing.*;
 
 public class GuiAgent extends Agent
 {
+    private JFrame jFrame;
+    private Window guiWindow;
     private int rows;
     private int columns;
     private int stackSize;
@@ -25,12 +27,15 @@ public class GuiAgent extends Agent
         stackSize = Integer.parseInt((String)PortArgs[2]);
 
         // Create the GUI Window
-        JFrame jFrame = new JFrame("Main Panel");
-        jFrame.setContentPane(new Window(rows, columns, stackSize).mainPanel);
+        guiWindow = new Window(rows, columns, stackSize);
+        jFrame = new JFrame("Main Panel");
+        jFrame.setContentPane(guiWindow.mainPanel);
         jFrame.setTitle("Port Terminal Simulation");
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.pack();
         jFrame.setVisible(true);
+
+        GuiConsoleLog("[Gui] Started.");
 
         addBehaviour(ReceiveMessages);
     }
@@ -47,6 +52,7 @@ public class GuiAgent extends Agent
                 {
                     case "ConsoleLog":
                         System.out.println(getAID().getName() + " received log: " + msg.getContent());
+                        GuiConsoleLog(msg.getContent());
 
 //                        ACLMessage response = msg.createReply();
 //                        response.setPerformative(ACLMessage.INFORM);
@@ -64,4 +70,11 @@ public class GuiAgent extends Agent
             }
         }
     };
+
+
+    private void GuiConsoleLog(String msg)
+    {
+        // displays simulation time and text in the ConsoleLog area of Gui
+        guiWindow.getConsoleLog().append("[" + Utils.Clock.GetSimulationTime() + "] " + msg + "\n");
+    }
 }

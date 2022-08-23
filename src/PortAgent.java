@@ -41,6 +41,14 @@ public class PortAgent extends Agent
             e.printStackTrace();
         }
 
-        AgentUtils.Gui.Send(this, "ConsoleLog", "How's the weather today?");
+        AgentUtils.Gui.Send(this, "ConsoleLog", "[PortAgent] How's the weather today GuiAgent?");
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        AgentUtils.Gui.Send(this, "ConsoleLog", "[PortAgent] I waited 3 seconds to send this special message.");
     }
 }

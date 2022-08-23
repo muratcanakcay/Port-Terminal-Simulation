@@ -10,8 +10,16 @@ public class Window
     private JTextField destination;
     private JTextField count;
     private JPanel port;
-    private JButton drop;
+    private JButton changeButton; // TODO: this is just for testing. remove later.
     private JLabel Jlabel2;
+
+    public JTextArea getConsoleLog() {
+        return consoleLog;
+    }
+
+    private JTextArea consoleLog;
+
+
 
     public Window(int rows, int columns, int stackSize)
     {
@@ -55,7 +63,7 @@ public class Window
         }
 
         // TODO: Change to behaviour listening from cellAgent and changing Gui accordingly
-        drop.addActionListener(new ActionListener()
+        changeButton.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
