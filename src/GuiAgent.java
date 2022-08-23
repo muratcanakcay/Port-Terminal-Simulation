@@ -64,7 +64,7 @@ public class GuiAgent extends Agent
             }
 
             try {
-                Thread.sleep(500 / Utils.Clock.GetSimulationSpeed()); // TODO: optimize sleep duration to ensure good messaging
+                Thread.sleep(10 / Utils.Clock.GetSimulationSpeed()); // TODO: optimize sleep duration to ensure good messaging
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

@@ -20,7 +20,7 @@ public class PortAgent extends Agent
         int stackSize = Integer.parseInt((String)PortArgs[2]);
         port = new Port(rows, columns, stackSize);
 
-        System.out.println("[PortAgent] Rows: " + port.getRows() + " Columns: " + port.getColumns() + " StackSize: " + port.getStackSize());
+        AgentUtils.Gui.Send(this, "ConsoleLog", "[PortAgent] Rows: " + port.getRows() + " Columns: " + port.getColumns() + " StackSize: " + port.getStackSize());
 
         AgentContainer ac = getContainerController();
 

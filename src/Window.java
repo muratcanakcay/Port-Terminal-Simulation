@@ -26,6 +26,7 @@ public class Window
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
         port.setLayout(new GridLayout(rows, columns));
+//        consoleLog = new JTextArea(5, 20);
 
         for (int r = 0; r < columns; r++)
         {

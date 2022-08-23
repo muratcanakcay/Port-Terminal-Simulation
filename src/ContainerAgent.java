@@ -17,6 +17,6 @@ public class ContainerAgent extends Agent
         // the Agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "ContainerAgent", container.getName());
 
-        System.out.printf("[%s] Agent is registered to DF.\n", container.getName());
+        AgentUtils.Gui.Send(this, "ConsoleLog", String.format("[Container %s] Agent is registered to DF.", container.getName()));
     }
 }
