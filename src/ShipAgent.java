@@ -53,11 +53,11 @@ public class ShipAgent extends Agent
         {
             AgentUtils.Gui.Send(myAgent, "ConsoleLog", String.format("[%s] Arrived at port! Containers on board:", ship.getName()));
 
-
             // print container list
+            int i = 0;
             for (Container container : ship.getContainers())
             {
-                System.out.println(container.getName());
+                AgentUtils.Gui.Send(myAgent, "ConsoleLog", String.format("%20d - %s", ++i, container.getName()));
             }
         }
     };

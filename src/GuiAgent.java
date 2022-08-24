@@ -51,7 +51,6 @@ public class GuiAgent extends Agent
                 switch(msg.getOntology())
                 {
                     case "ConsoleLog":
-                        System.out.println(getAID().getName() + " received log: " + msg.getContent());
                         GuiConsoleLog(msg.getContent());
 
 //                        ACLMessage response = msg.createReply();
@@ -75,6 +74,7 @@ public class GuiAgent extends Agent
     private void GuiConsoleLog(String msg)
     {
         // displays simulation time and text in the ConsoleLog area of Gui
+        // TODO: insert sending agent's name and align instead of receiving the name in the msg
         guiWindow.getConsoleLog().append("[" + Utils.Clock.GetSimulationTime() + "] " + msg + "\n");
     }
 }
