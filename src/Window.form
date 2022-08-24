@@ -78,7 +78,7 @@
           <text value="CHANGE 62"/>
         </properties>
       </component>
-      <scrollpane id="599b">
+      <scrollpane id="599b" binding="scrollPane">
         <constraints>
           <grid row="1" column="1" row-span="11" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
@@ -88,19 +88,7 @@
           <verticalScrollBarPolicy value="22"/>
         </properties>
         <border type="none"/>
-        <children>
-          <component id="cda91" class="javax.swing.JTextArea" binding="consoleLog">
-            <constraints/>
-            <properties>
-              <editable value="false"/>
-              <lineWrap value="true"/>
-              <margin top="5" left="5" bottom="15" right="5"/>
-              <maximumSize width="500" height="15"/>
-              <minimumSize width="50" height="14"/>
-              <preferredSize width="50" height="14"/>
-            </properties>
-          </component>
-        </children>
+        <children/>
       </scrollpane>
       <vspacer id="82b8e">
         <constraints>

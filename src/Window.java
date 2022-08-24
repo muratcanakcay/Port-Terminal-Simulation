@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +13,7 @@ public class Window
     private JPanel port;
     private JButton changeButton; // TODO: this is just for testing. remove later.
     private JLabel Jlabel2;
+    private JScrollPane scrollPane;
 
     public JTextArea getConsoleLog() {
         return consoleLog;
@@ -26,7 +28,13 @@ public class Window
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
         port.setLayout(new GridLayout(rows, columns));
-//        consoleLog = new JTextArea(5, 20);
+        consoleLog = new JTextArea(5, 20);
+        consoleLog.setMargin(new Insets(5, 5, 55, 5));
+        DefaultCaret caret = (DefaultCaret)consoleLog.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        scrollPane.setViewportView(consoleLog);
+        scrollPane.getPreferredSize();
+
 
         for (int r = 0; r < columns; r++)
         {
