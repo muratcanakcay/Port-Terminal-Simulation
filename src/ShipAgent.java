@@ -25,7 +25,7 @@ public class ShipAgent extends Agent
         // the Agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "ShipAgent", shipName);
 
-        AgentUtils.Gui.Send(this, "ConsoleLog", String.format("[%s] Agent is registered to DF.", ship.getName()));
+        AgentUtils.Gui.Send(this, "console", String.format("[%s] Agent is registered to DF.", ship.getName()));
 
         addBehaviour(checkArrival);
     }
@@ -37,7 +37,7 @@ public class ShipAgent extends Agent
         {
             int currentTime = Clock.GetSimulationTime();
             int timeToArrival = ship.getArrivalTime() - currentTime;
-            AgentUtils.Gui.Send(myAgent, "ConsoleLog", String.format("[%s] Simulation Time: %s  Arrival: %s", ship.getName(), currentTime, timeToArrival));
+            AgentUtils.Gui.Send(myAgent, "console", String.format("[%s] Arrival in: %s", ship.getName(), timeToArrival));
             if (timeToArrival == 0)
             {
                 removeBehaviour(checkArrival);
@@ -51,13 +51,13 @@ public class ShipAgent extends Agent
         @Override
         public void action()
         {
-            AgentUtils.Gui.Send(myAgent, "ConsoleLog", String.format("[%s] Arrived at port! Containers on board:", ship.getName()));
+            AgentUtils.Gui.Send(myAgent, "console", String.format("[%s] Arrived at port! Containers on board:", ship.getName()));
 
             // print container list
             int i = 0;
             for (Container container : ship.getContainers())
             {
-                AgentUtils.Gui.Send(myAgent, "ConsoleLog", String.format("%20d - %s", ++i, container.getName()));
+                AgentUtils.Gui.Send(myAgent, "console", String.format("%20d - %s", ++i, container.getName()));
             }
         }
     };

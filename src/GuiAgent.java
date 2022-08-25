@@ -9,8 +9,8 @@ import javax.swing.*;
 
 public class GuiAgent extends Agent
 {
-    private JFrame jFrame;
-    private Window guiWindow;
+    private JFrame mainFrame;
+    private guiWindow guiWindow;
     private int rows;
     private int columns;
     private int stackSize;
@@ -27,15 +27,15 @@ public class GuiAgent extends Agent
         stackSize = Integer.parseInt((String)PortArgs[2]);
 
         // Create the GUI Window
-        guiWindow = new Window(rows, columns, stackSize);
-        jFrame = new JFrame("Main Panel");
-        jFrame.setContentPane(guiWindow.mainPanel);
-        jFrame.setTitle("Port Terminal Simulation");
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jFrame.pack();
-        jFrame.setVisible(true);
+        guiWindow = new guiWindow(rows, columns, stackSize);
+        mainFrame = new JFrame("Main Frame");
+        mainFrame.setContentPane(guiWindow.mainPanel);
+        mainFrame.setTitle("Port Terminal Simulation");
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.pack();
+        mainFrame.setVisible(true);
 
-        GuiConsoleLog("[Gui] Started.");
+        consoleLog("[Gui] Started.");
 
         addBehaviour(ReceiveMessages);
     }
@@ -50,8 +50,8 @@ public class GuiAgent extends Agent
             {
                 switch(msg.getOntology())
                 {
-                    case "ConsoleLog":
-                        GuiConsoleLog(msg.getContent());
+                    case "console":
+                        consoleLog(msg.getContent());
 
 //                        ACLMessage response = msg.createReply();
 //                        response.setPerformative(ACLMessage.INFORM);
@@ -71,10 +71,10 @@ public class GuiAgent extends Agent
     };
 
 
-    private void GuiConsoleLog(String msg)
+    private void consoleLog(String msg)
     {
-        // displays simulation time and text in the ConsoleLog area of Gui
+        // displays simulation time and text in the console area of Gui
         // TODO: insert sending agent's name and align instead of receiving the name in the msg
-        guiWindow.getConsoleLog().append("[" + Utils.Clock.GetSimulationTime() + "] " + msg + "\n");
+        guiWindow.getConsole().append("[" + Utils.Clock.GetSimulationTime() + "] " + msg + "\n");
     }
 }

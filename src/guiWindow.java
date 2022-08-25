@@ -5,35 +5,36 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Window
+public class guiWindow
 {
     public  JPanel mainPanel;
     private JTextField destination;
     private JTextField count;
-    private JPanel port;
+    private JPanel cellGrid;
     private JButton changeButton; // TODO: this is just for testing. remove later.
     private JLabel Jlabel2;
-    private JScrollPane scrollPane;
+    private JScrollPane scrollPaneForConsole;
 
-    public JTextArea getConsoleLog() {
-        return consoleLog;
+    private final JTextArea console;
+    public JTextArea getConsole()
+    {
+        return console;
     }
 
-    private JTextArea consoleLog;
 
 
 
-    public Window(int rows, int columns, int stackSize)
+    public guiWindow(int rows, int columns, int stackSize)
     {
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
-        port.setLayout(new GridLayout(rows, columns));
-        consoleLog = new JTextArea(5, 20);
-        consoleLog.setMargin(new Insets(5, 5, 55, 5));
-        DefaultCaret caret = (DefaultCaret)consoleLog.getCaret();
+        cellGrid.setLayout(new GridLayout(rows, columns));
+        console = new JTextArea(5, 20);
+        console.setMargin(new Insets(20, 10, 55, 10));
+        DefaultCaret caret = (DefaultCaret) console.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        scrollPane.setViewportView(consoleLog);
-        scrollPane.getPreferredSize();
+        scrollPaneForConsole.setViewportView(console);
+        scrollPaneForConsole.getPreferredSize();
 
 
         for (int r = 0; r < columns; r++)
@@ -47,11 +48,11 @@ public class Window
                 for (int s = 0; s < stackSize; s++)
                     cell.add(new JTextField());
 
-                port.add(cell);
+                cellGrid.add(cell);
             }
         }
 
-        Component[] cells = port.getComponents();
+        Component[] cells = cellGrid.getComponents();
         // iterate over cells...
         int i = 0;
         for (Component cellComponent : cells)
@@ -80,7 +81,7 @@ public class Window
                 int r = 1;
                 int c = 2;
 
-                Component[] panels = port.getComponents();
+                Component[] panels = cellGrid.getComponents();
                 JPanel panel = ((JPanel)panels[r*columns + c]);
 
                 Component[] stacks = panel.getComponents();
