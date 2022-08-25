@@ -6,6 +6,11 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import java.awt.*;
 
 public class GuiAgent extends Agent
 {
@@ -35,7 +40,7 @@ public class GuiAgent extends Agent
         mainFrame.pack();
         mainFrame.setVisible(true);
 
-        consoleLog("[Gui] Started.");
+        consoleLog(getAID(), "Started.");
 
         addBehaviour(ReceiveMessages);
     }
@@ -51,7 +56,7 @@ public class GuiAgent extends Agent
                 switch(msg.getOntology())
                 {
                     case "console":
-                        consoleLog(msg.getContent());
+                        consoleLog(msg.getSender(), msg.getContent());
 
 //                        ACLMessage response = msg.createReply();
 //                        response.setPerformative(ACLMessage.INFORM);
@@ -71,10 +76,29 @@ public class GuiAgent extends Agent
     };
 
 
-    private void consoleLog(String msg)
+    private void consoleLog(jade.core.AID sender, String msg)
     {
         // displays simulation time and text in the console area of Gui
         // TODO: insert sending agent's name and align instead of receiving the name in the msg
-        guiWindow.getConsole().append("[" + Utils.Clock.GetSimulationTime() + "] " + msg + "\n");
+        Document doc = guiWindow.getConsole().getStyledDocument();
+
+
+
+        try
+        {
+            SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+            StyleConstants.setBold(attributeSet, true);
+            doc.insertString(doc.getLength(), "[" + Utils.Clock.GetSimulationTime() + "] ", attributeSet);
+
+            attributeSet = new SimpleAttributeSet();
+            StyleConstants.setBold(attributeSet, true);
+            StyleConstants.setForeground(attributeSet, Color.red);
+            doc.insertString(doc.getLength(), "[" + sender.getLocalName() + "] ", attributeSet);
+
+            doc.insertString(doc.getLength(), msg + "\n", new SimpleAttributeSet());
+        }
+        catch (BadLocationException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

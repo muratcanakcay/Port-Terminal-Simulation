@@ -18,6 +18,6 @@ public class CellAgent extends Agent
         // the Agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "CellAgent", "Cell" + row + ":" + column);
 
-        AgentUtils.Gui.Send(this, "console", String.format("[%s] Agent is registered to DF.", cell.getName()));
+        AgentUtils.Gui.Send(this, "console", "Agent is registered to DF.");
     }
 }

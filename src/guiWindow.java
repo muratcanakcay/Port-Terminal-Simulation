@@ -15,8 +15,8 @@ public class guiWindow
     private JLabel Jlabel2;
     private JScrollPane scrollPaneForConsole;
 
-    private final JTextArea console;
-    public JTextArea getConsole()
+    private final JTextPane console;
+    public JTextPane getConsole()
     {
         return console;
     }
@@ -29,7 +29,7 @@ public class guiWindow
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
         cellGrid.setLayout(new GridLayout(rows, columns));
-        console = new JTextArea(5, 20);
+        console = new JTextPane();
         console.setMargin(new Insets(20, 10, 55, 10));
         DefaultCaret caret = (DefaultCaret) console.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);

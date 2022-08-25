@@ -20,7 +20,7 @@ public class PortAgent extends Agent
         int stackSize = Integer.parseInt((String)PortArgs[2]);
         port = new Port(rows, columns, stackSize);
 
-        AgentUtils.Gui.Send(this, "console", "[PortAgent] Rows: " + port.getRows() + " Columns: " + port.getColumns() + " StackSize: " + port.getStackSize());
+        AgentUtils.Gui.Send(this, "console", "Rows: " + port.getRows() + " Columns: " + port.getColumns() + " StackSize: " + port.getStackSize());
 
         AgentContainer ac = getContainerController();
 
@@ -41,7 +41,7 @@ public class PortAgent extends Agent
             e.printStackTrace();
         }
 
-        AgentUtils.Gui.Send(this, "console", "[PortAgent] How's the weather today GuiAgent?");
+        AgentUtils.Gui.Send(this, "console", "How's the weather today GuiAgent?");
 
         try {
             Thread.sleep(3000);
@@ -49,6 +49,6 @@ public class PortAgent extends Agent
             throw new RuntimeException(e);
         }
 
-        AgentUtils.Gui.Send(this, "console", "[PortAgent] I waited 3 seconds to send this special message.");
+        AgentUtils.Gui.Send(this, "console", "I waited 3 seconds to send this special message.");
     }
 }
