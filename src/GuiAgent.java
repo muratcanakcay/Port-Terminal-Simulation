@@ -42,12 +42,13 @@ public class GuiAgent extends Agent
         mainFrame.pack();
         mainFrame.setVisible(true);
 
-        consoleLog(getAID(), "Started.");
+        consoleLog(getAID(), "Started.", Color.BLACK, Color.WHITE);
 
         addBehaviour(ReceiveMessages);
     }
 
-    Behaviour ReceiveMessages = new CyclicBehaviour(this) {
+    Behaviour ReceiveMessages = new CyclicBehaviour(this)
+    {
         @Override
         public void action()
         {
@@ -58,13 +59,16 @@ public class GuiAgent extends Agent
                 switch(msg.getOntology())
                 {
                     case "console":
-                        consoleLog(msg.getSender(), msg.getContent());
+                        consoleLog(msg.getSender(), msg.getContent(), Color.BLACK, Color.WHITE);
 
 //                        ACLMessage response = msg.createReply();
 //                        response.setPerformative(ACLMessage.INFORM);
 //                        response.setContent("Today it's raining.");
 //                        System.out.println(getAID().getName() + " is sending response message!");
 //                        send(response);
+                        break;
+                    case "console-error":
+                        consoleLog(msg.getSender(), msg.getContent(), Color.RED, Color.WHITE);
                         break;
                 }
             }
@@ -78,7 +82,7 @@ public class GuiAgent extends Agent
     };
 
 
-    private void consoleLog(jade.core.AID sender, String msg)
+    private void consoleLog(jade.core.AID sender, String msg, Color textColor, Color highlightColor)
     {
         // displays simulation time and text in the console area of Gui
         // TODO: insert sending agent's name and align instead of receiving the name in the msg
@@ -86,16 +90,22 @@ public class GuiAgent extends Agent
 
         try
         {
+            // simulation time
             SimpleAttributeSet attributeSet = new SimpleAttributeSet();
             StyleConstants.setBold(attributeSet, true);
             doc.insertString(doc.getLength(), "[" + Utils.Clock.GetSimulationTime() + "] ", attributeSet);
 
+            // sender
             attributeSet = new SimpleAttributeSet();
             StyleConstants.setBold(attributeSet, true);
-            StyleConstants.setForeground(attributeSet, Color.red);
+            StyleConstants.setForeground(attributeSet, Color.blue);
             doc.insertString(doc.getLength(), "[" + sender.getLocalName() + "] ", attributeSet);
 
-            doc.insertString(doc.getLength(), msg + "\n", new SimpleAttributeSet());
+            // message
+            attributeSet = new SimpleAttributeSet();
+            StyleConstants.setForeground(attributeSet, textColor);
+            StyleConstants.setBackground(attributeSet, highlightColor);
+            doc.insertString(doc.getLength(), msg + "\n", attributeSet);
         }
         catch (BadLocationException e) {
             throw new RuntimeException(e);

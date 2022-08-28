@@ -6,10 +6,13 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.lang.acl.ACLMessage;
 
 public class ShipAgent extends Agent
 {
     Ship ship;
+    DFAgentDescription portAgent;
 
     @Override
     protected void setup()
@@ -22,10 +25,12 @@ public class ShipAgent extends Agent
 
         ship = new Ship(shipName, arrivalTime, departureTime, containers);
 
-        // the Agent registers itself to DF
+        // agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "ShipAgent", shipName);
-
         AgentUtils.Gui.Send(this, "console", "Agent is registered to DF.");
+
+        // agent gets the portAgent from DF
+        portAgent = AgentUtils.searchDF(this, "portAgent", "portAgent")[0];
 
         addBehaviour(checkArrival);
     }
@@ -51,6 +56,9 @@ public class ShipAgent extends Agent
         @Override
         public void action()
         {
+            // notify port that the ship arrived
+            AgentUtils.SendMessage(myAgent, portAgent.getName(), ACLMessage.INFORM, "ship-arrived", ship.getName() + "arrived");
+
             AgentUtils.Gui.Send(myAgent, "console", "Arrived at port! Containers on board:");
 
             // print container list

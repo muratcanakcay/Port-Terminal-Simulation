@@ -64,4 +64,13 @@ public class AgentUtils
 
         return new DFAgentDescription[0];
     }
+
+    public static void SendMessage(jade.core.Agent agent, jade.core.AID receiver, int perf, String ontology, String content)
+    {
+        ACLMessage msg = new ACLMessage(perf);
+        msg.addReceiver(receiver);
+        msg.setOntology(ontology);
+        msg.setContent(content);
+        agent.send(msg);
+    }
 }
