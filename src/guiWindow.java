@@ -25,7 +25,7 @@ public class guiWindow
 
 
 
-    public guiWindow(int rows, int columns, int stackSize)
+    public guiWindow(int rows, int columns, int stackSize, int noOfCranes)
     {
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
@@ -54,7 +54,6 @@ public class guiWindow
         }
 
         // craneGrid
-        int noOfCranes = 2; // TODO: make this an argument
         craneGrid.setLayout(new GridLayout(noOfCranes + 1, 5));
 
         for (int r = 0; r < noOfCranes + 1; r++)
@@ -68,7 +67,7 @@ public class guiWindow
                 {
                     Font boldCraneTextFont = new Font(crane.getFont().getName(), Font.BOLD, crane.getFont().getSize());
                     crane.setFont(boldCraneTextFont);
-                    if (c==0) crane.setText("Crane");
+                    if (c==0) crane.setText("classes.Crane");
                     if (c==1) crane.setText("Status");
                     if (c==2) crane.setText("Container");
                     if (c==3) crane.setText("From");
@@ -77,6 +76,7 @@ public class guiWindow
                 else
                 {
                     if (c==0) crane.setText("Crane0" + r);
+                    if (c==1) crane.setText("IDLE");
                 }
 
                 craneGrid.add(crane);

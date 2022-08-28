@@ -15,7 +15,7 @@ public class ShipAgent extends Agent
     protected void setup()
     {
         Object[] ShipArgs = getArguments();
-        String shipName = "Ship" + ShipArgs[0];
+        String shipName = (String)ShipArgs[0];
         int arrivalTime = Integer.parseInt((String)ShipArgs[1]);
         int departureTime = Integer.parseInt((String)ShipArgs[2]);
         Container[] containers = (Container[])ShipArgs[3];

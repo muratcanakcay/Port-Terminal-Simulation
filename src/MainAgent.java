@@ -12,7 +12,7 @@ import static java.util.UUID.randomUUID;
 public class MainAgent extends Agent
 {
     private int simulationSpeed = 1;
-    Object[] PortArgs = {"3", "4", "5"};   // Container storage stats: rows, columns, stackSize
+    Object[] PortArgs = {"3", "4", "5", "2"};   // Container storage stats: rows, columns, stackSize, noOfCranes
 
     @Override
     protected void setup()
@@ -53,7 +53,11 @@ public class MainAgent extends Agent
             }
 
             // TODO: implement a method to add a new ship with incremental ship number
-            AgentController Ship = ac.createNewAgent("Ship001", "ShipAgent", new Object[]{"001", "5", "10", containers});
+            int shipNumber = 58;
+            String shipName = "Ship";
+            shipName += shipNumber < 10 ? "00" : shipNumber < 100 ? "0" : "";
+            shipName += shipNumber;
+            AgentController Ship = ac.createNewAgent(shipName, "ShipAgent", new Object[]{shipName, "5", "10", containers});
             Ship.start();
         }
         catch (Exception e) {

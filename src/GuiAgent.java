@@ -19,6 +19,7 @@ public class GuiAgent extends Agent
     private int rows;
     private int columns;
     private int stackSize;
+    private int noOfCranes;
 
     @Override
     protected void setup()
@@ -30,9 +31,10 @@ public class GuiAgent extends Agent
         rows = Integer.parseInt((String)PortArgs[0]);
         columns = Integer.parseInt((String)PortArgs[1]);
         stackSize = Integer.parseInt((String)PortArgs[2]);
+        noOfCranes = Integer.parseInt((String)PortArgs[3]);
 
         // Create the GUI Window
-        guiWindow = new guiWindow(rows, columns, stackSize);
+        guiWindow = new guiWindow(rows, columns, stackSize, noOfCranes);
         mainFrame = new JFrame("Main Frame");
         mainFrame.setContentPane(guiWindow.mainPanel);
         mainFrame.setTitle("Port Terminal Simulation");
@@ -81,8 +83,6 @@ public class GuiAgent extends Agent
         // displays simulation time and text in the console area of Gui
         // TODO: insert sending agent's name and align instead of receiving the name in the msg
         Document doc = guiWindow.getConsole().getStyledDocument();
-
-
 
         try
         {

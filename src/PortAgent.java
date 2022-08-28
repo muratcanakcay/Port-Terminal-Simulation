@@ -18,9 +18,11 @@ public class PortAgent extends Agent
         int rows = Integer.parseInt((String)PortArgs[0]);
         int columns = Integer.parseInt((String)PortArgs[1]);
         int stackSize = Integer.parseInt((String)PortArgs[2]);
-        port = new Port(rows, columns, stackSize);
+        int noOfCranes = Integer.parseInt((String)PortArgs[3]);
 
-        AgentUtils.Gui.Send(this, "console", "Rows: " + port.getRows() + " Columns: " + port.getColumns() + " StackSize: " + port.getStackSize());
+        port = new Port(rows, columns, stackSize, noOfCranes);
+
+        AgentUtils.Gui.Send(this, "console", "Rows: " + port.getRows() + " Columns: " + port.getColumns() + " StackSize: " + port.getStackSize() + " noOfCranes: " + port.getNoOfCranes());
 
         AgentContainer ac = getContainerController();
 
@@ -35,6 +37,20 @@ public class PortAgent extends Agent
                     AgentController Cell = ac.createNewAgent("Cell" + r + ":" + c, "CellAgent", CellArgs);
                     Cell.start();
                 }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Create the craneAgents
+        try
+        {
+            for (int i = 0; i < noOfCranes; ++i)
+            {
+                Object[] CraneArgs = {"Crane0" + i};
+                AgentController Cell = ac.createNewAgent("Crane0" + i, "CraneAgent", CraneArgs);
+                Cell.start();
             }
         }
         catch (Exception e) {
