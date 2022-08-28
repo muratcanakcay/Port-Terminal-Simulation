@@ -15,7 +15,11 @@ public class guiWindow
     private JLabel Jlabel2;
     private JScrollPane scrollPaneForConsole;
     private JPanel craneGrid;
-
+    private JPanel dockGrid;
+    public JPanel getDockGrid()
+    {
+        return dockGrid;
+    }
     private final JTextPane console;
     public JTextPane getConsole()
     {
@@ -25,7 +29,7 @@ public class guiWindow
 
 
 
-    public guiWindow(int rows, int columns, int stackSize, int noOfCranes)
+    public guiWindow(int rows, int columns, int stackSize, int noOfCranes, int dockSize)
     {
         Border blackline = BorderFactory.createLineBorder(Color.black);
 
@@ -53,9 +57,8 @@ public class guiWindow
             }
         }
 
-        // craneGrid
-        craneGrid.setLayout(new GridLayout(noOfCranes + 1, 5));
-
+        // initialize craneGrid
+        craneGrid.setLayout(new GridLayout(noOfCranes + 1, 5)); // first is row for headings
         for (int r = 0; r < noOfCranes + 1; r++)
         {
             for (int c = 0; c < 5; c++)
@@ -67,7 +70,7 @@ public class guiWindow
                 {
                     Font boldCraneTextFont = new Font(crane.getFont().getName(), Font.BOLD, crane.getFont().getSize());
                     crane.setFont(boldCraneTextFont);
-                    if (c==0) crane.setText("classes.Crane");
+                    if (c==0) crane.setText("Crane No.");
                     if (c==1) crane.setText("Status");
                     if (c==2) crane.setText("Container");
                     if (c==3) crane.setText("From");
@@ -83,7 +86,37 @@ public class guiWindow
             }
         }
 
-        // console area
+        // initialize dockGrid
+        dockGrid.setLayout(new GridLayout(dockSize + 1, 5)); // first is row for headings
+        for (int r = 0; r < dockSize + 1; r++)
+        {
+            for (int c = 0; c < 5; c++)
+            {
+                JTextField ship = new JTextField();
+                ship.setEditable(false);
+                if (r == 0)
+                {
+                    Font boldShipTextFont = new Font(ship.getFont().getName(), Font.BOLD, ship.getFont().getSize());
+                    ship.setFont(boldShipTextFont);
+                    if (c==0) ship.setText("Ship Name");
+                    if (c==1) ship.setText("Status");
+                    if (c==2) ship.setText("Containers");
+                    if (c==3) ship.setText("Arrival");
+                    if (c==4) ship.setText("Departure");
+                }
+                else
+                {
+                    ship.setText("");
+                    ship.setBackground(Color.WHITE);
+                }
+
+                dockGrid.add(ship);
+            }
+        }
+
+        // TODO: create a grid for incoming/waiting ships
+
+        // initialize console area
         console = new JTextPane();
         console.setMargin(new Insets(20, 10, 55, 10));
         DefaultCaret caret = (DefaultCaret) console.getCaret();

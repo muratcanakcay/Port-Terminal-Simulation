@@ -1,6 +1,6 @@
 import classes.AgentUtils;
-import classes.Port;
 import classes.Utils;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -8,9 +8,22 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 public class PortAgent extends Agent
 {
-    private Port port;
+    private int rows;
+    private int columns;
+    private int stackSize;
+    private int noOfCranes;
+    private int dockSize; // no of ships that can dock simultaneously
+
+    Queue<AID> waitingShips = new PriorityQueue<AID>();
+    List<jade.core.AID> dockedShips = new ArrayList<jade.core.AID>();
+
 
     @Override
     protected void setup()
@@ -20,34 +33,28 @@ public class PortAgent extends Agent
 
         // get arguments
         Object[] PortArgs = getArguments();
-        int rows = Integer.parseInt((String)PortArgs[0]);
-        int columns = Integer.parseInt((String)PortArgs[1]);
-        int stackSize = Integer.parseInt((String)PortArgs[2]);
-        int noOfCranes = Integer.parseInt((String)PortArgs[3]);
-
-        // create ship object
-        port = new Port(rows, columns, stackSize, noOfCranes);
+        rows = Integer.parseInt((String)PortArgs[0]);
+        columns = Integer.parseInt((String)PortArgs[1]);
+        stackSize = Integer.parseInt((String)PortArgs[2]);
+        noOfCranes = Integer.parseInt((String)PortArgs[3]);
+        dockSize = Integer.parseInt((String)PortArgs[4]);
 
         // start listening for messages
         addBehaviour(ReceiveMessages);
 
-
-
-
-
-
-        AgentUtils.Gui.Send(this, "console", "Rows: " + port.getRows() + " Columns: " + port.getColumns() + " StackSize: " + port.getStackSize() + " noOfCranes: " + port.getNoOfCranes());
+        // informative console log
+        AgentUtils.Gui.Send(this, "console", "Port created with Rows: " + getRows() + " Columns: " + getColumns() + " StackSize: " + getStackSize() + " noOfCranes: " + getNoOfCranes());
 
         AgentContainer ac = getContainerController();
 
-        // Create the cell agents of the container storage
+        // create the cell agents of the container storage
         try
         {
             for (int r = 0; r < rows; ++r)
             {
                 for (int c = 0; c < columns; ++c)
                 {
-                    Object[] CellArgs = {String.valueOf(r), String.valueOf(c), String.valueOf(port.getStackSize())};
+                    Object[] CellArgs = {String.valueOf(r), String.valueOf(c), String.valueOf(getStackSize())};
                     AgentController Cell = ac.createNewAgent("Cell" + r + ":" + c, "CellAgent", CellArgs);
                     Cell.start();
                 }
@@ -57,7 +64,7 @@ public class PortAgent extends Agent
             e.printStackTrace();
         }
 
-        // Create the craneAgents
+        // create the craneAgents
         try
         {
             for (int i = 0; i < noOfCranes; ++i)
@@ -71,7 +78,7 @@ public class PortAgent extends Agent
             e.printStackTrace();
         }
 
-        // Create the unloader
+        // create a sample unloaderAgent TODO: delete later
         try
         {
             String shipName = "Ship002";
@@ -94,13 +101,13 @@ public class PortAgent extends Agent
 
             if (msg != null)
             {
+                AgentUtils.Gui.Send(myAgent, "console", "Received message from: " +  msg.getSender().getLocalName() + " : " + msg.getContent());
+
                 switch(msg.getOntology())
                 {
                     case "ship-arrived":
-                        AgentUtils.Gui.Send(myAgent, "console", "Received message: " + msg.getContent());
-
+                        handleArrivedShip(msg.getSender());
                         break;
-
                 }
             }
 
@@ -111,4 +118,26 @@ public class PortAgent extends Agent
             }
         }
     };
+
+    public int getRows() { return rows; }
+    public int getColumns() { return columns; }
+    public int getStackSize() { return stackSize; }
+    public int getNoOfCranes() { return noOfCranes; }
+    public int getNoOfWaitingShips() { return waitingShips.size(); }
+
+    private void handleArrivedShip(AID shipAgent)
+    {
+        if (dockedShips.size() == dockSize)
+        {
+            waitingShips.add(shipAgent);
+            AgentUtils.SendMessage(this, shipAgent, ACLMessage.INFORM, "port-order-wait", "wait");
+        }
+        else
+        {
+            dockedShips.add(shipAgent);
+            AgentUtils.SendMessage(this, shipAgent, ACLMessage.INFORM, "port-order-dock", "dock");
+            AgentUtils.Gui.Send(this, "console", "Ordered " + shipAgent.getLocalName() + " to dock");
+
+        }
+    }
 }

@@ -21,7 +21,7 @@ public class Container
         this.destination = destination;
     }
 
-    public String getName() {
+    public String getContainerName() {
         return name;
     }
 

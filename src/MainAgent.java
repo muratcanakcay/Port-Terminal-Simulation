@@ -12,7 +12,7 @@ import static java.util.UUID.randomUUID;
 public class MainAgent extends Agent
 {
     private int simulationSpeed = 1;
-    Object[] PortArgs = {"3", "4", "5", "2"};   // Container storage stats: rows, columns, stackSize, noOfCranes
+    Object[] PortArgs = {"3", "4", "5", "2", "1"};   // Container storage stats: rows, columns, stackSize, noOfCranes, dockSize
 
     @Override
     protected void setup()
