@@ -3,7 +3,7 @@ import classes.Container;
 import classes.Utils.Clock;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 
@@ -11,8 +11,8 @@ import static java.util.UUID.randomUUID;
 
 public class MainAgent extends Agent
 {
-    private int simulationSpeed = 1;
-    Object[] PortArgs = {"3", "4", "5", "2", "1"};   // Container storage stats: rows, columns, stackSize, noOfCranes, dockSize
+    private final int simulationSpeed = 1;
+    Object[] PortArgs = {"3", "4", "5", "2", "1"};   // rows, columns, stackSize, noOfCranes, dockSize
 
     @Override
     protected void setup()
@@ -67,13 +67,14 @@ public class MainAgent extends Agent
         addBehaviour(runClock);
     }
 
-    Behaviour runClock = new TickerBehaviour(this, 1000/simulationSpeed)
+    Behaviour runClock = new CyclicBehaviour(this)
     {
         @Override
-        public void onTick()
+        public void action()
         {
             Clock.tick();
-            // System.out.println("[MainAgent] Simulation Time: " + Clock.GetSimulationTime());
+            AgentUtils.Gui.Send(myAgent, "clock-tick", String.valueOf(Clock.GetSimulationTime()));
+            block(1000/Clock.GetSimulationSpeed());
         }
     };
 }

@@ -45,6 +45,7 @@ public class GuiAgent extends Agent
         addBehaviour(ReceiveMessages);
     }
 
+
     Behaviour ReceiveMessages = new CyclicBehaviour(this)
     {
         @Override
@@ -71,15 +72,13 @@ public class GuiAgent extends Agent
                     case "ship-docked":
                         setShipDocked(msg);
                         break;
-
+                    case "clock-tick":
+                        ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(0)).getComponent(0)).setText(msg.getContent());
+                        break;
                 }
             }
 
-            try {
-                Thread.sleep(10 / Utils.Clock.GetSimulationSpeed()); // TODO: optimize sleep duration to ensure good messaging
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
 
@@ -105,13 +104,6 @@ public class GuiAgent extends Agent
 
             }
         }
-
-
-
-
-
-
-
     }
 
 

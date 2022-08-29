@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 public class guiWindow
 {
     public  JPanel mainPanel;
-    private JTextField destination;
     private JTextField count;
     private JPanel cellGrid;
     private JButton changeButton; // TODO: this is just for testing. remove later.
@@ -16,6 +15,8 @@ public class guiWindow
     private JScrollPane scrollPaneForConsole;
     private JPanel craneGrid;
     private JPanel dockGrid;
+    private JPanel simulationTimePanel;
+    public JPanel getSimulationTimePanel() { return simulationTimePanel; }
     public JPanel getDockGrid()
     {
         return dockGrid;
@@ -28,10 +29,37 @@ public class guiWindow
 
 
 
-
     public guiWindow(int rows, int columns, int stackSize, int noOfCranes, int dockSize)
     {
-        Border blackline = BorderFactory.createLineBorder(Color.black);
+        Border blackLine = BorderFactory.createLineBorder(Color.black);
+
+        // initialize clockPanel
+        simulationTimePanel.setLayout(new GridLayout(1, 2));
+
+
+        JTextField clock = new JTextField();
+        clock.setEditable(false);
+        Font boldClockFont = new Font(clock.getFont().getName(), Font.BOLD, 16);
+        clock.setFont(boldClockFont);
+        clock.setBackground(Color.WHITE);
+//        Insets clockMargin = new Insets(5, 5, 5, 5);
+//        clock.setMargin(clockMargin);
+        clock.setText("0");
+        clock.setHorizontalAlignment(JTextField.RIGHT);
+
+        JPanel clockPanel = new JPanel();
+        clockPanel.setLayout(new BorderLayout());
+        clockPanel.setBorder(blackLine);
+
+        clockPanel.add(clock);
+
+        JPanel pauseButtonPanel = new JPanel();
+        pauseButtonPanel.setBorder(blackLine);
+        pauseButtonPanel.add(new Button("Pause"));
+
+        simulationTimePanel.add(clockPanel);
+        simulationTimePanel.add(pauseButtonPanel);
+
 
         // initialize cellGrid
         cellGrid.setLayout(new GridLayout(rows, columns));
@@ -40,7 +68,7 @@ public class guiWindow
             for (int c = 0; c < columns; c++)
             {
                 JPanel cell = new JPanel();
-                cell.setBorder(blackline);
+                cell.setBorder(blackLine);
                 cell.setLayout(new GridLayout(stackSize, 1));
 
                 for (int s = 0; s < stackSize; s++)
