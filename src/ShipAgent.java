@@ -67,11 +67,7 @@ public class ShipAgent extends Agent
                 }
             }
 
-            try {
-                Thread.sleep(10 / Utils.Clock.GetSimulationSpeed()); // TODO: optimize sleep duration to ensure good messaging
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            block(10 / Utils.Clock.GetSimulationSpeed()); // TODO: optimize sleep duration to ensure good messaging
         }
     };
 
