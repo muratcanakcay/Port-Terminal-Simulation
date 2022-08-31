@@ -3,26 +3,33 @@ import classes.Utils;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
-
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Objects;
 
 public class GuiAgent extends Agent
 {
+    private DFAgentDescription mainAgent;
     private guiWindow guiWindow;
     private int dockSize;
+    private boolean clockRunning = true;
 
     @Override
     protected void setup()
     {
         // the Agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "GuiAgent", "GuiAgent");
+
+        // get mainAgent from DF to be able to send button clicks to it
+        mainAgent = AgentUtils.searchDF(this, "MainAgent", "MainAgent")[0];
 
         Object[] PortArgs = getArguments();
         int rows = Integer.parseInt((String) PortArgs[0]);
@@ -42,9 +49,29 @@ public class GuiAgent extends Agent
 
         consoleLog(getAID(), "Started.", Color.BLACK, Color.WHITE);
 
+        initializePauseButton(this);
+
         addBehaviour(ReceiveMessages);
     }
 
+    private void initializePauseButton(Agent guiAgent)
+    {
+        Button pauseButton = guiWindow.getPauseButton();
+
+        pauseButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                AgentUtils.SendMessage(guiAgent, mainAgent.getName(), ACLMessage.INFORM, "play-pause", "play-pause");
+
+                if (clockRunning) { pauseButton.setLabel("Play"); }
+                else {pauseButton.setLabel("Pause");}
+
+                clockRunning = !clockRunning;
+            }
+        });
+    }
 
     Behaviour ReceiveMessages = new CyclicBehaviour(this)
     {
@@ -91,17 +118,17 @@ public class GuiAgent extends Agent
         // find empty row in dockGrid and fill it with ship info from msg
         for (int i = 1; i < dockSize + 1; ++i) // skip first row - it's for headers
         {
-            if (Objects.equals(((JTextField)dockGridComponents[5*i]).getText(), ""))
+            if (Objects.equals(((JTextField)dockGridComponents[5*i]).getText(), ""))        // check empty row
             {
-                ((JTextField)dockGridComponents[5*i]).setText(msg.getSender().getLocalName());
-
                 String[] shipInfo = msg.getContent().split(":", -1);
 
-                ((JTextField)dockGridComponents[5*i + 1]).setText(shipInfo[0]);
-                ((JTextField)dockGridComponents[5*i + 2]).setText(shipInfo[1]);
-                ((JTextField)dockGridComponents[5*i + 3]).setText(shipInfo[2]);
-                ((JTextField)dockGridComponents[5*i + 4]).setText(shipInfo[3]);
+                ((JTextField)dockGridComponents[5*i]).setText(msg.getSender().getLocalName());  // ship name
+                ((JTextField)dockGridComponents[5*i + 1]).setText(shipInfo[0]);                 // status
+                ((JTextField)dockGridComponents[5*i + 2]).setText(shipInfo[1]);                 // no of containers
+                ((JTextField)dockGridComponents[5*i + 3]).setText(shipInfo[2]);                 // arrival time
+                ((JTextField)dockGridComponents[5*i + 4]).setText(shipInfo[3]);                 // departure time
 
+                break;
             }
         }
     }

@@ -1,9 +1,11 @@
 import classes.AgentUtils;
 import classes.Container;
+import classes.Utils;
 import classes.Utils.Clock;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 
@@ -11,6 +13,7 @@ import static java.util.UUID.randomUUID;
 
 public class MainAgent extends Agent
 {
+    private boolean clockRunning = true;
     private final int simulationSpeed = 1;
     Object[] PortArgs = {"3", "4", "5", "2", "1"};   // rows, columns, stackSize, noOfCranes, dockSize
 
@@ -64,17 +67,43 @@ public class MainAgent extends Agent
             e.printStackTrace();
         }
 
-        addBehaviour(runClock);
+        addBehaviour(RunClock);
+        addBehaviour(ReceiveMessages);
     }
 
-    Behaviour runClock = new CyclicBehaviour(this)
+    Behaviour RunClock = new CyclicBehaviour(this)
     {
         @Override
         public void action()
         {
-            Clock.tick();
-            AgentUtils.Gui.Send(myAgent, "clock-tick", String.valueOf(Clock.GetSimulationTime()));
-            block(1000/Clock.GetSimulationSpeed());
+            if (clockRunning)
+            {
+                Clock.tick();
+                AgentUtils.Gui.Send(myAgent, "clock-tick", String.valueOf(Clock.GetSimulationTime()));
+                block(1000 / Clock.GetSimulationSpeed());
+            }
+        }
+    };
+
+    Behaviour ReceiveMessages = new CyclicBehaviour(this)
+    {
+        @Override
+        public void action()
+        {
+            ACLMessage msg = receive();
+
+            if (msg != null)
+            {
+                switch(msg.getOntology())
+                {
+                    case "play-pause":
+                        clockRunning = !clockRunning;
+                        AgentUtils.Gui.Send(myAgent, "console", "SIMULATION " + (clockRunning ? "RUNNING" : "PAUSED"));
+                        break;
+                }
+            }
+
+            block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
 }

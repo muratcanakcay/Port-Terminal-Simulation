@@ -14,9 +14,9 @@ public class guiWindow
     private JLabel Jlabel2;
     private JScrollPane scrollPaneForConsole;
     private JPanel craneGrid;
-    private JPanel dockGrid;
     private JPanel simulationTimePanel;
     public JPanel getSimulationTimePanel() { return simulationTimePanel; }
+    private JPanel dockGrid;
     public JPanel getDockGrid()
     {
         return dockGrid;
@@ -26,8 +26,8 @@ public class guiWindow
     {
         return console;
     }
-
-
+    private Button pauseButton = new Button("Pause");
+    public Button getPauseButton() { return pauseButton; }
 
     public guiWindow(int rows, int columns, int stackSize, int noOfCranes, int dockSize)
     {
@@ -55,7 +55,7 @@ public class guiWindow
 
         JPanel pauseButtonPanel = new JPanel();
         pauseButtonPanel.setBorder(blackLine);
-        pauseButtonPanel.add(new Button("Pause"));
+        pauseButtonPanel.add(pauseButton);
 
         simulationTimePanel.add(clockPanel);
         simulationTimePanel.add(pauseButtonPanel);
@@ -151,8 +151,6 @@ public class guiWindow
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         scrollPaneForConsole.setViewportView(console);
         scrollPaneForConsole.getPreferredSize();
-
-
 
 //        Component[] cells = cellGrid.getComponents();
 //        // iterate over cells...
