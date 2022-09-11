@@ -3,7 +3,9 @@ import classes.Utils;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -161,5 +163,20 @@ public class GuiAgent extends Agent
         catch (BadLocationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected void takeDown()
+    {
+        // Deregister from the yellow pages
+        try {
+            DFService.deregister(this);
+        }
+        catch (FIPAException fe) {
+            fe.printStackTrace();
+        }
+
+        // Printout a dismissal message
+        System.out.println(getAID().getName() + " terminated.");
     }
 }

@@ -4,6 +4,8 @@ import classes.Utils.Clock;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
@@ -118,5 +120,20 @@ public class MainAgent extends Agent
         shipName += shipNumber;
         AgentController Ship = ac.createNewAgent(shipName, "ShipAgent", new Object[]{shipName, arrivalTime, destination, containerAgents});
         Ship.start();
+    }
+
+    @Override
+    protected void takeDown()
+    {
+        // Deregister from the yellow pages
+        try {
+            DFService.deregister(this);
+        }
+        catch (FIPAException fe) {
+            fe.printStackTrace();
+        }
+
+        // Printout a dismissal message
+        System.out.println(getAID().getName() + " terminated.");
     }
 }

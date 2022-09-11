@@ -5,7 +5,9 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 
 import java.util.Objects;
@@ -23,17 +25,17 @@ public abstract class UnloaderAgent extends Agent
 
         DFAgentDescription[] ships = AgentUtils.searchDF(this, "shipAgent", shipName);
 
-        if (ships.length != 1) {
-            AgentUtils.Gui.Send(this, "console-error", "There's " + ships.length + " ship(s) with the name: " + shipName);
-            takeDown();
-            return;
-        }
-
-        shipAgent = ships[0].getName();
-
         // agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "UnloaderAgent", name);
         AgentUtils.Gui.Send(this, "console", "Agent is registered to DF.");
+
+        if (ships.length != 1)
+        {
+            AgentUtils.Gui.Send(this, "console-error", "There's " + ships.length + " ship(s) with the name: " + shipName);
+            doDelete();
+        }
+
+        shipAgent = ships[0].getName();
 
         addBehaviour(RequestContainerFromShip);
         addBehaviour(ReceiveMessages);
@@ -84,6 +86,15 @@ public abstract class UnloaderAgent extends Agent
     @Override
     protected void takeDown()
     {
+        // Deregister from the yellow pages
+        try {
+            DFService.deregister(this);
+        }
+        catch (FIPAException fe) {
+            fe.printStackTrace();
+        }
+
+        // Printout a dismissal message
         System.out.println(getAID().getName() + " terminated.");
     }
 }

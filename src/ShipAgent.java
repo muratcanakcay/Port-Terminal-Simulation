@@ -8,6 +8,8 @@ import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 
 import java.util.Queue;
@@ -128,4 +130,19 @@ public class ShipAgent extends Agent
     public int getArrivalTime() { return arrivalTime; }
     public int getDepartureTime() { return departureTime; }
     public Queue<String> getContainers() { return containers; }
+
+    @Override
+    protected void takeDown()
+    {
+        // Deregister from the yellow pages
+        try {
+            DFService.deregister(this);
+        }
+        catch (FIPAException fe) {
+            fe.printStackTrace();
+        }
+
+        // Printout a dismissal message
+        System.out.println(getAID().getName() + " terminated.");
+    }
 }
