@@ -106,12 +106,36 @@ public class GuiAgent extends Agent
                         break;
                     case "port-incoming-ships":
                         setIncomingShips(msg.getContent());
+                    case "unloader-unloaded-ship":
+                        updateDockedShip(msg.getContent(), false);
+                        break;
+                    case "loader-loaded-ship":
+                        updateDockedShip(msg.getContent(), true);
+                        break;
                 }
             }
 
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void updateDockedShip(String shipName, boolean increaseContainerCount)
+    {
+        Component[] dockGridComponents = guiWindow.getDockGrid().getComponents();
+
+        // find ship's row in dockGrid and update containers
+        for (int i = 1; i < dockSize + 1; ++i) // skip first row - it's for headers
+        {
+            if (Objects.equals(((JTextField)dockGridComponents[5*i]).getText(), shipName))
+            {
+                int containerCount = Integer.parseInt(((JTextField)dockGridComponents[5*i + 2]).getText());
+                containerCount += increaseContainerCount ? 1 : -1;
+
+                ((JTextField)dockGridComponents[5*i + 2]).setText(String.valueOf(containerCount));
+                break;
+            }
+        }
+    }
 
     private void setIncomingShips(String content)
     {
@@ -136,7 +160,7 @@ public class GuiAgent extends Agent
                 ((JTextField)dockGridComponents[5*i + 1]).setText(shipInfo[0]);                 // status
                 ((JTextField)dockGridComponents[5*i + 2]).setText(shipInfo[1]);                 // no of containers
                 ((JTextField)dockGridComponents[5*i + 3]).setText(shipInfo[2]);                 // arrival time
-                ((JTextField)dockGridComponents[5*i + 4]).setText(shipInfo[3]);                 // departure time
+                ((JTextField)dockGridComponents[5*i + 4]).setText(shipInfo[3]);                 // destination
 
                 break;
             }

@@ -93,6 +93,7 @@ public abstract class UnloaderAgent extends Agent
         AgentUtils.SendMessage(this, portAgent, ACLMessage.REQUEST, "unloader-request-shipETA", destination);
 
         //AgentUtils.Gui.Send(this, "console-error", "Placed container " + currentContainerName);
+        AgentUtils.Gui.Send(this, "unloader-unloaded-ship", shipAgent.getLocalName());
         addBehaviour(RequestContainerFromShip); // TODO: this should actually be called when the current container is finally handed to the crane
     }
 

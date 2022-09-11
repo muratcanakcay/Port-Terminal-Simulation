@@ -62,13 +62,13 @@ public class ShipAgent extends Agent
                 {
                     case "port-order-wait":
                         status = ShipStatus.WAITING;
-                        AgentUtils.Gui.Send(myAgent, "ship-waiting", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + departureTime);
+                        AgentUtils.Gui.Send(myAgent, "ship-waiting", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + destination);
                         AgentUtils.Gui.Send(myAgent, "console", "Waiting");
                         break;
                     case "port-order-dock":
                         if (containers.size() == 0) {status = ShipStatus.DOCKED_FOR_LOADING;}
                         else {status = ShipStatus.DOCKED_FOR_UNLOADING;}
-                        AgentUtils.Gui.Send(myAgent, "ship-docked", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + departureTime);
+                        AgentUtils.Gui.Send(myAgent, "ship-docked", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + destination);
                         AgentUtils.Gui.Send(myAgent, "console", "Docked");
                         break;
                     case "unloader-request-container":
@@ -136,9 +136,6 @@ public class ShipAgent extends Agent
         response.setContent(nextContainer);
         send(response);
     }
-
-
-
 
     public String getShipName() { return shipName; }
     public int getArrivalTime() { return arrivalTime; }

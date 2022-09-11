@@ -143,7 +143,7 @@ public class guiWindow
                     if (c==1) ship.setText("Status");
                     if (c==2) ship.setText("Containers");
                     if (c==3) ship.setText("Arrival");
-                    if (c==4) ship.setText("Departure");
+                    if (c==4) ship.setText("Destination");
                 }
                 else
                 {
