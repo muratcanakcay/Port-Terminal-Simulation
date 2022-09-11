@@ -123,7 +123,17 @@ public class PortAgent extends Agent
             incomingShipsList += "Ship Name: " + shipInfoParts[0] + " ----- Destination: " + shipInfoParts[1] + " ----- ArrivalTime: " + shipInfoParts[2] + "\n";
         }
 
+        Collections.sort(incomingShips, new SortByETA());
+
         AgentUtils.Gui.Send(this, "port-incoming-ships", incomingShipsList);
+    }
+
+    static class SortByETA implements Comparator<String>
+    {
+        public int compare(String a, String b)
+        {
+            return Integer.parseInt(a.split(":")[2]) - Integer.parseInt(b.split(":")[2]);
+        }
     }
 
     private void handleArrivedShip(AID shipAgent)
