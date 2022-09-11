@@ -77,12 +77,34 @@ public class PortAgent extends Agent
                     case "ship-arrived":
                         handleArrivedShip(msg.getSender());
                         break;
+
+                    case "unloader-request-shipETA":
+                        sendShipETAtoUnloader(msg);
+                        break;
                 }
             }
 
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void sendShipETAtoUnloader(ACLMessage msg)
+    {
+        String destination = msg.getContent();
+        ACLMessage response = msg.createReply();
+        response.setPerformative(ACLMessage.INFORM);
+        response.setOntology("port-shipETA");
+
+        String shipETA = "-1";
+        for (String shipInfo : incomingShips)
+        {
+            String[] shipInfoParts = shipInfo.split(":");
+            if (Objects.equals(shipInfoParts[1], destination)) { shipETA = shipInfoParts[2];}
+        }
+
+        response.setContent(shipETA);
+        send(response);
+    }
 
     private void handleIncomingShip(ACLMessage msg)
     {

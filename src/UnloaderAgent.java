@@ -15,7 +15,10 @@ import java.util.Objects;
 public abstract class UnloaderAgent extends Agent
 {
     String name;
+    String currentContainerName;
+    String currentDestination;
     AID shipAgent;
+    AID portAgent;
 
     @Override
     protected void setup() {
@@ -35,10 +38,12 @@ public abstract class UnloaderAgent extends Agent
             doDelete();
         }
 
+        // agent gets the portAgent from DF
+        portAgent = AgentUtils.searchDF(this, "PortAgent", "PortAgent")[0].getName();
         shipAgent = ships[0].getName();
 
-        addBehaviour(RequestContainerFromShip);
         addBehaviour(ReceiveMessages);
+        addBehaviour(RequestContainerFromShip);
     }
 
     Behaviour RequestContainerFromShip = new OneShotBehaviour(this)
@@ -64,10 +69,17 @@ public abstract class UnloaderAgent extends Agent
                 switch(msg.getOntology())
                 {
                     case "ship-next-container":
-                        if (Objects.equals(msg.getContent(), "All containers unloaded")) {  } // TODO: implement agent termination, let port know and thus order ship to leave
+                        currentContainerName = msg.getContent();
+                        if (Objects.equals(currentContainerName, "All containers unloaded")) {  } // TODO: implement agent termination, let port know and thus order ship to leave
                         else { requestContainerDestination(msg.getContent()); }
                         break;
                     case "container-destination":
+                        currentDestination = msg.getContent();
+                        requestETAofShipToDestination(currentDestination);
+                        break;
+                    case "port-shipETA":
+                        int shipETA = Integer.parseInt(msg.getContent());
+                        if (shipETA < 0) { AgentUtils.Gui.Send(myAgent, "console-error", "There's no ship that will take " + currentContainerName + " to destination " + currentDestination); }
                         break;
                 }
             }
@@ -76,14 +88,18 @@ public abstract class UnloaderAgent extends Agent
         }
     };
 
+    private void requestETAofShipToDestination(String destination)
+    {
+        AgentUtils.SendMessage(this, portAgent, ACLMessage.REQUEST, "unloader-request-shipETA", destination);
+
+        //AgentUtils.Gui.Send(this, "console-error", "Placed container " + currentContainerName);
+        addBehaviour(RequestContainerFromShip); // TODO: this should actually be called when the current container is finally handed to the crane
+    }
+
     private void requestContainerDestination(String containerName)
     {
-        AgentUtils.Gui.Send(this, "console-error", "Placed container " + containerName);
-
         AID containerAgent = AgentUtils.searchDF(this, "ContainerAgent", containerName)[0].getName();
         AgentUtils.SendMessage(this, containerAgent, ACLMessage.REQUEST, "unloader-request-destination", "What is your destination?");
-
-        addBehaviour(RequestContainerFromShip); // TODO: this should actually be called when the current container is finally handed to the crane
     }
 
 

@@ -42,7 +42,6 @@ public class ShipAgent extends Agent
         // agent gets the portAgent from DF
         portAgent = AgentUtils.searchDF(this, "PortAgent", "PortAgent")[0].getName();
 
-
         addBehaviour(NotifyPortOfIncoming);
         addBehaviour(CheckArrival);
         addBehaviour(ReceiveMessages);

@@ -52,6 +52,7 @@ public class MainAgent extends Agent
 
             // create sample ship : ship058 with 3 containers
             createShip058();
+            createShip007();
 
 
         }
@@ -116,6 +117,21 @@ public class MainAgent extends Agent
         String shipName = "Ship";
         String arrivalTime = "5";
         String destination = "mainPort";
+        shipName += shipNumber < 10 ? "00" : shipNumber < 100 ? "0" : "";
+        shipName += shipNumber;
+        AgentController Ship = ac.createNewAgent(shipName, "ShipAgent", new Object[]{shipName, arrivalTime, destination, containerAgents});
+        Ship.start();
+    }
+
+    private void createShip007() throws StaleProxyException
+    {
+        Queue<String> containerAgents = new PriorityQueue<String>();
+
+        // TODO: implement a method to add a new ship with incremental ship number
+        int shipNumber = 7;
+        String shipName = "Ship";
+        String arrivalTime = "20";
+        String destination = "A";
         shipName += shipNumber < 10 ? "00" : shipNumber < 100 ? "0" : "";
         shipName += shipNumber;
         AgentController Ship = ac.createNewAgent(shipName, "ShipAgent", new Object[]{shipName, arrivalTime, destination, containerAgents});
