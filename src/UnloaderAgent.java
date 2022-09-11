@@ -44,7 +44,7 @@ public abstract class UnloaderAgent extends Agent
         @Override
         public void action()
         {
-            AgentUtils.SendMessage(myAgent, shipAgent, ACLMessage.QUERY_IF, "unloader-request-container", "");
+            AgentUtils.SendMessage(myAgent, shipAgent, ACLMessage.QUERY_IF, "unloader-request-container", "Requesting next container to unload");
         }
     };
 
@@ -58,20 +58,25 @@ public abstract class UnloaderAgent extends Agent
             if (msg != null)
             {
                 AgentUtils.Gui.Send(myAgent, "console", "Received message from: " +  msg.getSender().getLocalName() + " : " + msg.getContent());
-                if (!Objects.equals(msg.getContent(), "")) { addBehaviour(RequestContainerFromShip); }
 
-//                switch(msg.getOntology())
-//                {
-//                    case "ship-arrived":
-//                        handleArrivedShip(msg.getSender());
-//                        break;
-//                }
+                switch(msg.getOntology())
+                {
+                    case "ship-next-container":
+                        if (!Objects.equals(msg.getContent(), "All containers unloaded")) { handleContainer(msg.getContent()); }
+                        break;
+                }
             }
 
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
 
+    private void handleContainer(String containerName)
+    {
+        AgentUtils.Gui.Send(this, "console-error", "Placed container " + containerName);
+
+        addBehaviour(RequestContainerFromShip);
+    }
 
 
     abstract void unloadAction();

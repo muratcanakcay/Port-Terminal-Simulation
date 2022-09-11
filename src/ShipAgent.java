@@ -81,7 +81,7 @@ public class ShipAgent extends Agent
     private void sendNextContainerToUnloader(ACLMessage msg)
     {
         String nextContainer;
-        if (containers.size() == 0) { nextContainer = ""; } // all unloaded
+        if (containers.size() == 0) { nextContainer = "All containers unloaded"; } // all unloaded
         else { nextContainer = containers.remove(); }
 
         ACLMessage response = msg.createReply();
@@ -121,15 +121,6 @@ public class ShipAgent extends Agent
         {
             // notify port that the ship arrived
             AgentUtils.SendMessage(myAgent, portAgent, ACLMessage.INFORM, "ship-arrived", "arrived");
-
-            AgentUtils.Gui.Send(myAgent, "console", "Arrived and informed port! Containers on board:");
-
-            // print container list
-//            int i = 0;
-//            for (String containerName : getContainers()) //
-//            {
-//                AgentUtils.Gui.Send(myAgent, "console", String.format("%20d - %s", ++i, containerName));
-//            }
         }
     };
 

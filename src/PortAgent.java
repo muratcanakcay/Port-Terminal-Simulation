@@ -97,7 +97,6 @@ public class PortAgent extends Agent
         {
             dockedShips.add(shipAgent);
             AgentUtils.SendMessage(this, shipAgent, ACLMessage.INFORM, "port-order-dock", "dock");
-            AgentUtils.Gui.Send(this, "console", "Ordered " + shipAgent.getLocalName() + " to dock");
 
             //create unloader for the docked ship
             unloaderFactory.createUnloaderAgentFor(shipAgent.getLocalName());
