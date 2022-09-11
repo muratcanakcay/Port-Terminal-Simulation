@@ -15,7 +15,7 @@ public class AgentUtils
         public Gui(jade.core.Agent agent)
         {
             // get the GuiAgent AID from DF
-            GuiAgent = searchDF(agent, "GuiAgent", "GuiAgent")[0].getName();
+            GuiAgent = searchDFbyName(agent, "GuiAgent")[0].getName();
         }
 
         // send a String message to GuiAgent with defined ontology
@@ -46,13 +46,30 @@ public class AgentUtils
         }
     }
 
-    public static DFAgentDescription[] searchDF(jade.core.Agent agent, String type, String name)
+    public static DFAgentDescription[] searchDFbyName(jade.core.Agent agent, String name)
+    {
+        DFAgentDescription template = new DFAgentDescription();
+        ServiceDescription sd = new ServiceDescription();
+
+        sd.setName(name);
+        template.addServices(sd);
+
+        try {
+            return DFService.search(agent, template);
+        }
+        catch (FIPAException fe) {
+            fe.printStackTrace();
+        }
+
+        return new DFAgentDescription[0];
+    }
+
+    public static DFAgentDescription[] searchDFbyType(jade.core.Agent agent, String type)
     {
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
 
         sd.setType(type);
-        sd.setName(name);
         template.addServices(sd);
 
         try {

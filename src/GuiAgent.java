@@ -31,7 +31,7 @@ public class GuiAgent extends Agent
         AgentUtils.registerToDF(this, getAID(), "GuiAgent", "GuiAgent");
 
         // get mainAgent from DF to be able to send button clicks to it
-        mainAgent = AgentUtils.searchDF(this, "MainAgent", "MainAgent")[0];
+        mainAgent = AgentUtils.searchDFbyName(this, "MainAgent")[0];
 
         Object[] PortArgs = getArguments();
         int rows = Integer.parseInt((String) PortArgs[0]);

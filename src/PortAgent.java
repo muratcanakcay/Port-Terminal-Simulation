@@ -110,6 +110,7 @@ public class PortAgent extends Agent
     {
         String[] shipInfo = msg.getContent().split(":");
         incomingShips.add(msg.getSender().getLocalName() + ":" + shipInfo[0] + ":" + shipInfo[1]);
+        incomingShips.sort(new SortByETA());
         updateGuiIncomingShips();
     }
 
@@ -122,8 +123,6 @@ public class PortAgent extends Agent
             String[] shipInfoParts = shipInfo.split(":");
             incomingShipsList += "Ship Name: " + shipInfoParts[0] + " ----- Destination: " + shipInfoParts[1] + " ----- ArrivalTime: " + shipInfoParts[2] + "\n";
         }
-
-        Collections.sort(incomingShips, new SortByETA());
 
         AgentUtils.Gui.Send(this, "port-incoming-ships", incomingShipsList);
     }
@@ -200,7 +199,7 @@ public class PortAgent extends Agent
                 for (int c = 0; c < columns; ++c)
                 {
                     Object[] CellArgs = {String.valueOf(r), String.valueOf(c), String.valueOf(getStackSize())};
-                    AgentController Cell = ac.createNewAgent("Cell" + r + ":" + c, "CellAgent", CellArgs);
+                    AgentController Cell = ac.createNewAgent("Cell:" + r + ":" + c, "CellAgent", CellArgs);
                     Cell.start();
                 }
             }

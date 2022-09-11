@@ -9,16 +9,22 @@ import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.proto.ProposeInitiator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class UnloaderAgent extends Agent
 {
-    String name;
-    String currentContainerName;
-    String currentDestination;
-    AID shipAgent;
-    AID portAgent;
+    private String name;
+    private String currentContainerName;
+    private String currentDestination;
+    protected AID shipAgent;
+    private AID portAgent;
+    private final List<AID> cellAgents = new ArrayList<AID>();
+    private final List<String> availableCells = new ArrayList<>();
 
     @Override
     protected void setup() {
@@ -26,7 +32,7 @@ public abstract class UnloaderAgent extends Agent
         name = (String) UnloaderArgs[0];
         String shipName = (String) UnloaderArgs[1];
 
-        DFAgentDescription[] ships = AgentUtils.searchDF(this, "shipAgent", shipName);
+        DFAgentDescription[] ships = AgentUtils.searchDFbyName(this, shipName);
 
         // agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "UnloaderAgent", name);
@@ -36,11 +42,16 @@ public abstract class UnloaderAgent extends Agent
         {
             AgentUtils.Gui.Send(this, "console-error", "There's " + ships.length + " ship(s) with the name: " + shipName);
             doDelete();
+            return;
         }
 
-        // agent gets the portAgent from DF
-        portAgent = AgentUtils.searchDF(this, "PortAgent", "PortAgent")[0].getName();
+        // agent gets the shipAgent from DF
         shipAgent = ships[0].getName();
+        // agent gets the portAgent from DF
+        portAgent = AgentUtils.searchDFbyName(this, "PortAgent")[0].getName();
+        // agent gets the cellAgents from DF
+        DFAgentDescription[] cellAgentDescriptions = AgentUtils.searchDFbyType(this, "CellAgent");
+        for (DFAgentDescription cellAgentDescription : cellAgentDescriptions) { cellAgents.add(cellAgentDescription.getName()); }
 
         addBehaviour(ReceiveMessages);
         addBehaviour(RequestContainerFromShip);
@@ -60,7 +71,8 @@ public abstract class UnloaderAgent extends Agent
         @Override
         public void action()
         {
-            ACLMessage msg = receive();
+            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+            ACLMessage msg = receive(mt);
 
             if (msg != null)
             {
@@ -80,6 +92,7 @@ public abstract class UnloaderAgent extends Agent
                     case "port-shipETA":
                         int shipETA = Integer.parseInt(msg.getContent());
                         if (shipETA < 0) { AgentUtils.Gui.Send(myAgent, "console-error", "There's no ship that will take " + currentContainerName + " to destination " + currentDestination); }
+                        sendCFPtoCells(msg.getContent());
                         break;
                 }
             }
@@ -88,23 +101,47 @@ public abstract class UnloaderAgent extends Agent
         }
     };
 
+    private void sendCFPtoCells(String shipETA)
+    {
+        ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+
+        for (AID cellAgent : cellAgents)
+        {
+            cfp.addReceiver(cellAgent);
+        }
+
+        cfp.setContent(shipETA);
+
+        addBehaviour(new ProposeInitiator(this, cfp)
+        {
+            protected void handleAcceptProposal(ACLMessage accept_proposal)
+            {
+                String cellScore = accept_proposal.getContent();
+                String availableCell = accept_proposal.getSender().getName() + ":" + cellScore;
+                availableCells.add(availableCell);
+
+                AgentUtils.Gui.Send(myAgent, "console-error", "Available cell: " + availableCell); // TODO: delete this consoleLog later
+            };
+
+            protected void handleAllResponses(java.util.Vector responses)
+            {
+                removeBehaviour(this);
+                makeDecision();
+            }
+        });
+    }
+    protected abstract void makeDecision();
+
     private void requestETAofShipToDestination(String destination)
     {
         AgentUtils.SendMessage(this, portAgent, ACLMessage.REQUEST, "unloader-request-shipETA", destination);
-
-        //AgentUtils.Gui.Send(this, "console-error", "Placed container " + currentContainerName);
-        AgentUtils.Gui.Send(this, "unloader-unloaded-ship", shipAgent.getLocalName());
-        addBehaviour(RequestContainerFromShip); // TODO: this should actually be called when the current container is finally handed to the crane
     }
 
     private void requestContainerDestination(String containerName)
     {
-        AID containerAgent = AgentUtils.searchDF(this, "ContainerAgent", containerName)[0].getName();
+        AID containerAgent = AgentUtils.searchDFbyName(this, containerName)[0].getName();
         AgentUtils.SendMessage(this, containerAgent, ACLMessage.REQUEST, "unloader-request-destination", "What is your destination?");
     }
-
-
-    abstract void unloadAction();
 
     @Override
     protected void takeDown()

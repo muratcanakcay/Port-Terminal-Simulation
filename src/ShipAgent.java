@@ -40,7 +40,7 @@ public class ShipAgent extends Agent
         AgentUtils.Gui.Send(this, "console", "Agent is registered to DF.");
 
         // agent gets the portAgent from DF
-        portAgent = AgentUtils.searchDF(this, "PortAgent", "PortAgent")[0].getName();
+        portAgent = AgentUtils.searchDFbyName(this, "PortAgent")[0].getName();
 
         addBehaviour(NotifyPortOfIncoming);
         addBehaviour(CheckArrival);
