@@ -1,7 +1,6 @@
 import classes.AgentUtils;
 import classes.Utils;
 import classes.Utils.Clock;
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -100,15 +99,14 @@ public class MainAgent extends Agent
 
     private void createShip058() throws StaleProxyException {
         // create 3 sample containers to add to ship
-        Queue<AID> containerAgents = new PriorityQueue<AID>();
+        Queue<String> containerAgents = new PriorityQueue<String>();
         for (int i = 0; i < 3; i++)
         {
             String containerName = String.valueOf(randomUUID());
             String destination = "A";
             AgentController Container = ac.createNewAgent(containerName, "ContainerAgent", new Object[]{containerName, destination});
             Container.start();
-            while (AgentUtils.searchDF(this, "ContainerAgent", containerName).length == 0 ); //wait for the containerAgent to start
-            containerAgents.add(AgentUtils.searchDF(this, "ContainerAgent", containerName)[0].getName());
+            containerAgents.add(containerName);
         }
 
         // TODO: implement a method to add a new ship with incremental ship number

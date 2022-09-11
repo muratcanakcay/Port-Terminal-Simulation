@@ -19,7 +19,7 @@ public class ShipAgent extends Agent
     private int departureTime;
     private String destination;
     private String shipName;
-    private Queue<AID> containers;
+    private Queue<String> containers;
     private AID portAgent;
     private int timeToArrivalOld = -1;
 
@@ -31,7 +31,7 @@ public class ShipAgent extends Agent
         shipName = (String)ShipArgs[0];
         arrivalTime = Integer.parseInt((String)ShipArgs[1]);
         destination = (String)ShipArgs[2];
-        containers = (Queue<AID>)ShipArgs[3];
+        containers = (Queue<String>)ShipArgs[3];
 
         // agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "ShipAgent", shipName);
@@ -68,12 +68,28 @@ public class ShipAgent extends Agent
                         AgentUtils.Gui.Send(myAgent, "ship-docked", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + departureTime);
                         AgentUtils.Gui.Send(myAgent, "console", "Docked");
                         break;
+                    case "unloader-request-container":
+                        sendNextContainerToUnloader(msg);
+                        break;
                 }
             }
 
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void sendNextContainerToUnloader(ACLMessage msg)
+    {
+        String nextContainer;
+        if (containers.size() == 0) { nextContainer = ""; } // all unloaded
+        else { nextContainer = containers.remove(); }
+
+        ACLMessage response = msg.createReply();
+        response.setPerformative(ACLMessage.INFORM);
+        response.setOntology("ship-next-container");
+        response.setContent(nextContainer);
+        send(response);
+    }
 
     Behaviour CheckArrival = new TickerBehaviour(this, 1000 / Clock.GetSimulationSpeed())
     {
@@ -110,9 +126,9 @@ public class ShipAgent extends Agent
 
             // print container list
 //            int i = 0;
-//            for (AID container : getContainers()) //
+//            for (String containerName : getContainers()) //
 //            {
-//                AgentUtils.Gui.Send(myAgent, "console", String.format("%20d - %s", ++i, container.getLocalName()));
+//                AgentUtils.Gui.Send(myAgent, "console", String.format("%20d - %s", ++i, containerName));
 //            }
         }
     };
@@ -120,5 +136,5 @@ public class ShipAgent extends Agent
     public String getShipName() { return shipName; }
     public int getArrivalTime() { return arrivalTime; }
     public int getDepartureTime() { return departureTime; }
-    public Queue<AID> getContainers() { return containers; }
+    public Queue<String> getContainers() { return containers; }
 }
