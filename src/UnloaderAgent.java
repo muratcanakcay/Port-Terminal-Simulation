@@ -64,7 +64,10 @@ public abstract class UnloaderAgent extends Agent
                 switch(msg.getOntology())
                 {
                     case "ship-next-container":
-                        if (!Objects.equals(msg.getContent(), "All containers unloaded")) { handleContainer(msg.getContent()); }
+                        if (Objects.equals(msg.getContent(), "All containers unloaded")) {  } // TODO: implement agent termination, let port know and thus order ship to leave
+                        else { requestContainerDestination(msg.getContent()); }
+                        break;
+                    case "container-destination":
                         break;
                 }
             }
@@ -73,11 +76,14 @@ public abstract class UnloaderAgent extends Agent
         }
     };
 
-    private void handleContainer(String containerName)
+    private void requestContainerDestination(String containerName)
     {
         AgentUtils.Gui.Send(this, "console-error", "Placed container " + containerName);
 
-        addBehaviour(RequestContainerFromShip);
+        AID containerAgent = AgentUtils.searchDF(this, "ContainerAgent", containerName)[0].getName();
+        AgentUtils.SendMessage(this, containerAgent, ACLMessage.REQUEST, "unloader-request-destination", "What is your destination?");
+
+        addBehaviour(RequestContainerFromShip); // TODO: this should actually be called when the current container is finally handed to the crane
     }
 
 
