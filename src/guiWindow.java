@@ -13,10 +13,13 @@ public class guiWindow
     private JButton changeButton; // TODO: this is just for testing. remove later.
     private JLabel Jlabel2;
     private JScrollPane scrollPaneForConsole;
+    private JScrollPane scrollPaneForWaitingShips;
+    private JScrollPane scrollPaneForIncomingShips;
     private JPanel craneGrid;
     private JPanel simulationTimePanel;
     public JPanel getSimulationTimePanel() { return simulationTimePanel; }
     private JPanel dockGrid;
+
     public JPanel getDockGrid()
     {
         return dockGrid;
@@ -25,6 +28,16 @@ public class guiWindow
     public JTextPane getConsole()
     {
         return console;
+    }
+    private final JTextPane waitingShips;
+    public JTextPane getWaitingShips()
+    {
+        return waitingShips;
+    }
+    private final JTextPane incomingShips;
+    public JTextPane getIncomingShips()
+    {
+        return incomingShips;
     }
     private Button pauseButton = new Button("Pause");
     public Button getPauseButton() { return pauseButton; }
@@ -147,10 +160,28 @@ public class guiWindow
         // initialize console area
         console = new JTextPane();
         console.setMargin(new Insets(20, 10, 55, 10));
-        DefaultCaret caret = (DefaultCaret) console.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        DefaultCaret consoleCaret = (DefaultCaret) console.getCaret();
+        consoleCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         scrollPaneForConsole.setViewportView(console);
         scrollPaneForConsole.getPreferredSize();
+
+        // initialize waiting ships area
+        waitingShips = new JTextPane();
+        waitingShips.setMargin(new Insets(20, 10, 55, 10));
+        DefaultCaret waitingShipsCaret = (DefaultCaret) waitingShips.getCaret();
+        waitingShipsCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        scrollPaneForWaitingShips.setViewportView(waitingShips);
+        scrollPaneForWaitingShips.getPreferredSize();
+
+        // initialize incoming ships area
+        incomingShips = new JTextPane();
+        incomingShips.setMargin(new Insets(20, 10, 55, 10));
+        DefaultCaret incomingShipsCaret = (DefaultCaret) incomingShips.getCaret();
+        incomingShipsCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        scrollPaneForIncomingShips.setViewportView(incomingShips);
+        scrollPaneForIncomingShips.getPreferredSize();
+
+
 
 //        Component[] cells = cellGrid.getComponents();
 //        // iterate over cells...
