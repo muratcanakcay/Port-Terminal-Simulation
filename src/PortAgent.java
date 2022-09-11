@@ -15,6 +15,9 @@ import java.util.Queue;
 
 public class PortAgent extends Agent
 {
+    private String unloaderType = "BasicUnloaderAgent";
+    private UnloaderFactory unloaderFactory;
+    private AgentContainer ac;
     private int rows;
     private int columns;
     private int stackSize;
@@ -45,51 +48,13 @@ public class PortAgent extends Agent
         // informative console log
         AgentUtils.Gui.Send(this, "console", "Port created with Rows: " + getRows() + " Columns: " + getColumns() + " StackSize: " + getStackSize() + " noOfCranes: " + getNoOfCranes());
 
-        AgentContainer ac = getContainerController();
+        ac = getContainerController();
+        unloaderFactory = new UnloaderFactory(ac, unloaderType);
+        createCellAgents();
+        createCraneAgents();
 
-        // create the cell agents of the container storage
-        try
-        {
-            for (int r = 0; r < rows; ++r)
-            {
-                for (int c = 0; c < columns; ++c)
-                {
-                    Object[] CellArgs = {String.valueOf(r), String.valueOf(c), String.valueOf(getStackSize())};
-                    AgentController Cell = ac.createNewAgent("Cell" + r + ":" + c, "CellAgent", CellArgs);
-                    Cell.start();
-                }
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // create the craneAgents
-        try
-        {
-            for (int i = 0; i < noOfCranes; ++i)
-            {
-                Object[] CraneArgs = {"Crane0" + i};
-                AgentController Cell = ac.createNewAgent("Crane0" + i, "CraneAgent", CraneArgs);
-                Cell.start();
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // create a sample unloaderAgent TODO: delete later
-        try
-        {
-            String shipName = "Ship002";
-            String unloaderName = "UnloaderFor" + shipName;
-            Object[] UnloaderArgs = {unloaderName, shipName};
-            AgentController Unloader = ac.createNewAgent(unloaderName, "UnloaderAgent", UnloaderArgs);
-            Unloader.start();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        // test unloaderAgent (since there's no Ship002, it will fail and be indicated in red in the console )
+        unloaderFactory.createUnloaderAgentFor("Ship002");
     }
 
     Behaviour ReceiveMessages = new CyclicBehaviour(this)
@@ -134,6 +99,43 @@ public class PortAgent extends Agent
             AgentUtils.SendMessage(this, shipAgent, ACLMessage.INFORM, "port-order-dock", "dock");
             AgentUtils.Gui.Send(this, "console", "Ordered " + shipAgent.getLocalName() + " to dock");
 
+            //create unloader for the docked ship
+            unloaderFactory.createUnloaderAgentFor(shipAgent.getLocalName());
+        }
+    }
+
+    private void createCraneAgents()
+    {
+        try
+        {
+            for (int i = 0; i < noOfCranes; ++i)
+            {
+                Object[] CraneArgs = {"Crane0" + i};
+                AgentController Cell = ac.createNewAgent("Crane0" + i, "CraneAgent", CraneArgs);
+                Cell.start();
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createCellAgents()
+    {
+        try
+        {
+            for (int r = 0; r < rows; ++r)
+            {
+                for (int c = 0; c < columns; ++c)
+                {
+                    Object[] CellArgs = {String.valueOf(r), String.valueOf(c), String.valueOf(getStackSize())};
+                    AgentController Cell = ac.createNewAgent("Cell" + r + ":" + c, "CellAgent", CellArgs);
+                    Cell.start();
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
