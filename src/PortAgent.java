@@ -25,7 +25,7 @@ public class PortAgent extends Agent
     private int dockSize; // no of ships that can dock simultaneously
 
     Queue<AID> waitingShips = new PriorityQueue<AID>();
-    List<jade.core.AID> dockedShips = new ArrayList<jade.core.AID>();
+    List<AID> dockedShips = new ArrayList<jade.core.AID>();
 
 
     @Override
@@ -76,7 +76,7 @@ public class PortAgent extends Agent
                 }
             }
 
-            block(10 / Utils.Clock.GetSimulationSpeed()); // TODO: optimize sleep duration to ensure good messaging
+            block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
 

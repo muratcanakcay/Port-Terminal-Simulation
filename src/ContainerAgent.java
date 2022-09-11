@@ -1,21 +1,22 @@
 import classes.AgentUtils;
-import classes.Container;
 import jade.core.Agent;
 
 public class ContainerAgent extends Agent
 {
-    Container container;
+    private String containerName;
+    private String destination;
 
     @Override
     protected void setup()
     {
         Object[] ContainerArgs = getArguments();
-        container  = (Container)ContainerArgs[0];
+        containerName  = (String)ContainerArgs[0];
+        destination = (String)ContainerArgs[1];
 //        int departureTime = Integer.parseInt((String)ContainerArgs[2]);
 
 
         // the Agent registers itself to DF
-        AgentUtils.registerToDF(this, getAID(), "ContainerAgent", container.getContainerName());
+        AgentUtils.registerToDF(this, getAID(), "ContainerAgent", containerName);
 
         AgentUtils.Gui.Send(this, "console", "Agent is registered to DF.");
     }

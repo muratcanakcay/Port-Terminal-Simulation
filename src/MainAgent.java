@@ -1,18 +1,23 @@
 import classes.AgentUtils;
-import classes.Container;
 import classes.Utils;
 import classes.Utils.Clock;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
+import jade.wrapper.StaleProxyException;
+
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import static java.util.UUID.randomUUID;
 
 public class MainAgent extends Agent
 {
+    private AgentContainer ac;
     private boolean clockRunning = true;
     private final int simulationSpeed = 1;
     Object[] PortArgs = {"3", "4", "5", "2", "1"};   // rows, columns, stackSize, noOfCranes, dockSize
@@ -26,7 +31,7 @@ public class MainAgent extends Agent
         // start the clock
         Clock clock = new Clock(simulationSpeed);
 
-        AgentContainer ac = getContainerController();
+        ac = getContainerController();
 
         try
         {
@@ -44,24 +49,10 @@ public class MainAgent extends Agent
             AgentController Port = ac.createNewAgent("PortAgent", "PortAgent", PortArgs);
             Port.start();
 
-            // create 3 sample containers to add to ship
-            Container[] containers = new Container[3];
-            for (int i = 0; i < 3; i++)
-            {
-                String containerName = String.valueOf(randomUUID());
-                Container container = new Container(containerName, "Neverland");
-                containers[i] = container;
-                AgentController Container = ac.createNewAgent(containerName, "ContainerAgent", new Object[]{container});
-                Container.start();
-            }
+            // create sample ship : ship058 with 3 containers
+            createShip058();
 
-            // TODO: implement a method to add a new ship with incremental ship number
-            int shipNumber = 58;
-            String shipName = "Ship";
-            shipName += shipNumber < 10 ? "00" : shipNumber < 100 ? "0" : "";
-            shipName += shipNumber;
-            AgentController Ship = ac.createNewAgent(shipName, "ShipAgent", new Object[]{shipName, "5", "10", containers});
-            Ship.start();
+
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -106,4 +97,28 @@ public class MainAgent extends Agent
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void createShip058() throws StaleProxyException {
+        // create 3 sample containers to add to ship
+        Queue<AID> containerAgents = new PriorityQueue<AID>();
+        for (int i = 0; i < 3; i++)
+        {
+            String containerName = String.valueOf(randomUUID());
+            String destination = "A";
+            AgentController Container = ac.createNewAgent(containerName, "ContainerAgent", new Object[]{containerName, destination});
+            Container.start();
+            while (AgentUtils.searchDF(this, "ContainerAgent", containerName).length == 0 ); //wait for the containerAgent to start
+            containerAgents.add(AgentUtils.searchDF(this, "ContainerAgent", containerName)[0].getName());
+        }
+
+        // TODO: implement a method to add a new ship with incremental ship number
+        int shipNumber = 58;
+        String shipName = "Ship";
+        String arrivalTime = "5";
+        String destination = "mainPort";
+        shipName += shipNumber < 10 ? "00" : shipNumber < 100 ? "0" : "";
+        shipName += shipNumber;
+        AgentController Ship = ac.createNewAgent(shipName, "ShipAgent", new Object[]{shipName, arrivalTime, destination, containerAgents});
+        Ship.start();
+    }
 }

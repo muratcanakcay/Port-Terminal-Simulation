@@ -1,5 +1,6 @@
 import classes.AgentUtils;
 import classes.Utils;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -8,7 +9,7 @@ import jade.domain.FIPAAgentManagement.DFAgentDescription;
 public abstract class UnloaderAgent extends Agent
 {
     String name;
-    DFAgentDescription shipAgent;
+    AID shipAgent;
 
     @Override
     protected void setup() {
@@ -23,7 +24,7 @@ public abstract class UnloaderAgent extends Agent
             return; // TODO: destroy agent gracefully if no ship is found (is it necessary)?
         }
 
-        shipAgent = ships[0];
+        shipAgent = ships[0].getName();
 
         // agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "UnloaderAgent", name);

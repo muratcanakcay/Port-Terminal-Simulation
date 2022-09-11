@@ -1,24 +1,28 @@
 import classes.AgentUtils;
-import classes.Container;
 import classes.ShipStatus;
 import classes.Utils;
 import classes.Utils.Clock;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.TickerBehaviour;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.lang.acl.ACLMessage;
+
+import java.util.Queue;
 
 public class ShipAgent extends Agent
 {
     private ShipStatus status = ShipStatus.APPROACHING;
     private int arrivalTime;
     private int departureTime;
+    private String destination;
     private String shipName;
-    private Container[] containers;
-    private DFAgentDescription portAgent;
+    private Queue<AID> containers;
+    private AID portAgent;
+    private int timeToArrivalOld = -1;
+
 
     @Override
     protected void setup()
@@ -26,15 +30,15 @@ public class ShipAgent extends Agent
         Object[] ShipArgs = getArguments();
         shipName = (String)ShipArgs[0];
         arrivalTime = Integer.parseInt((String)ShipArgs[1]);
-        departureTime = Integer.parseInt((String)ShipArgs[2]);
-        containers = (Container[])ShipArgs[3];
+        destination = (String)ShipArgs[2];
+        containers = (Queue<AID>)ShipArgs[3];
 
         // agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "ShipAgent", shipName);
         AgentUtils.Gui.Send(this, "console", "Agent is registered to DF.");
 
         // agent gets the portAgent from DF
-        portAgent = AgentUtils.searchDF(this, "PortAgent", "PortAgent")[0];
+        portAgent = AgentUtils.searchDF(this, "PortAgent", "PortAgent")[0].getName();
 
         addBehaviour(CheckArrival);
         addBehaviour(ReceiveMessages);
@@ -55,19 +59,19 @@ public class ShipAgent extends Agent
                 {
                     case "port-order-wait":
                         status = ShipStatus.WAITING;
-                        AgentUtils.Gui.Send(myAgent, "ship-waiting", status.toString() + ":" + containers.length + ":" + arrivalTime + ":" + departureTime);
+                        AgentUtils.Gui.Send(myAgent, "ship-waiting", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + departureTime);
                         AgentUtils.Gui.Send(myAgent, "console", "Waiting");
                         break;
                     case "port-order-dock":
-                        if (containers.length == 0) {status = ShipStatus.DOCKED_FOR_LOADING;}
+                        if (containers.size() == 0) {status = ShipStatus.DOCKED_FOR_LOADING;}
                         else {status = ShipStatus.DOCKED_FOR_UNLOADING;}
-                        AgentUtils.Gui.Send(myAgent, "ship-docked", status.toString() + ":" + containers.length + ":" + arrivalTime + ":" + departureTime);
+                        AgentUtils.Gui.Send(myAgent, "ship-docked", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + departureTime);
                         AgentUtils.Gui.Send(myAgent, "console", "Docked");
                         break;
                 }
             }
 
-            block(10 / Utils.Clock.GetSimulationSpeed()); // TODO: optimize sleep duration to ensure good messaging
+            block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
 
@@ -78,7 +82,13 @@ public class ShipAgent extends Agent
         {
             int currentTime = Clock.GetSimulationTime();
             int timeToArrival = getArrivalTime() - currentTime;
-            AgentUtils.Gui.Send(myAgent, "console", String.format("Arrival in: %s", timeToArrival));
+
+            if (timeToArrival != timeToArrivalOld)
+            {
+                timeToArrivalOld = timeToArrival;
+                AgentUtils.Gui.Send(myAgent, "console", String.format("Arrival in: %s", timeToArrival));
+            }
+
             if (timeToArrival == 0)
             {
                 status = ShipStatus.ARRIVED;
@@ -94,21 +104,21 @@ public class ShipAgent extends Agent
         public void action()
         {
             // notify port that the ship arrived
-            AgentUtils.SendMessage(myAgent, portAgent.getName(), ACLMessage.INFORM, "ship-arrived", "arrived");
+            AgentUtils.SendMessage(myAgent, portAgent, ACLMessage.INFORM, "ship-arrived", "arrived");
 
             AgentUtils.Gui.Send(myAgent, "console", "Arrived and informed port! Containers on board:");
 
             // print container list
-            int i = 0;
-            for (Container container : getContainers()) // TODO: store containerAgents instead of containers (get rid of container Class)
-            {
-                AgentUtils.Gui.Send(myAgent, "console", String.format("%20d - %s", ++i, container.getContainerName()));
-            }
+//            int i = 0;
+//            for (AID container : getContainers()) //
+//            {
+//                AgentUtils.Gui.Send(myAgent, "console", String.format("%20d - %s", ++i, container.getLocalName()));
+//            }
         }
     };
 
     public String getShipName() { return shipName; }
     public int getArrivalTime() { return arrivalTime; }
     public int getDepartureTime() { return departureTime; }
-    public Container[] getContainers() { return containers; }
+    public Queue<AID> getContainers() { return containers; }
 }

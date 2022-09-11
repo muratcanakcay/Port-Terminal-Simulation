@@ -1,10 +1,12 @@
 package classes;
 
+import jade.core.AID;
+
 public class Crane
 {
     private CraneStatus status = CraneStatus.IDLE;
     String name;
-    Container container = null;
+    AID container = null;
 
     public Crane(String craneName_)
     {
@@ -13,5 +15,5 @@ public class Crane
 
     public String getName() { return name; }
     public CraneStatus getStatus() { return status; }
-    public Container getContainer() { return container; }
+    public AID getContainer() { return container; }
 }
