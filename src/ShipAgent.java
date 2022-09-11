@@ -42,6 +42,8 @@ public class ShipAgent extends Agent
         // agent gets the portAgent from DF
         portAgent = AgentUtils.searchDF(this, "PortAgent", "PortAgent")[0].getName();
 
+
+        addBehaviour(NotifyPortOfIncoming);
         addBehaviour(CheckArrival);
         addBehaviour(ReceiveMessages);
     }
@@ -80,18 +82,15 @@ public class ShipAgent extends Agent
         }
     };
 
-    private void sendNextContainerToUnloader(ACLMessage msg)
+    Behaviour NotifyPortOfIncoming = new OneShotBehaviour(this)
     {
-        String nextContainer;
-        if (containers.size() == 0) { nextContainer = "All containers unloaded"; } // all unloaded
-        else { nextContainer = containers.remove(); }
-
-        ACLMessage response = msg.createReply();
-        response.setPerformative(ACLMessage.INFORM);
-        response.setOntology("ship-next-container");
-        response.setContent(nextContainer);
-        send(response);
-    }
+        @Override
+        public void action()
+        {
+            // notify port that the ship is on its way
+            AgentUtils.SendMessage(myAgent, portAgent, ACLMessage.INFORM, "ship-incoming", destination + ":" + arrivalTime);
+        }
+    };
 
     Behaviour CheckArrival = new TickerBehaviour(this, 1000 / Clock.GetSimulationSpeed())
     {
@@ -125,6 +124,22 @@ public class ShipAgent extends Agent
             AgentUtils.SendMessage(myAgent, portAgent, ACLMessage.INFORM, "ship-arrived", "arrived");
         }
     };
+
+    private void sendNextContainerToUnloader(ACLMessage msg)
+    {
+        String nextContainer;
+        if (containers.size() == 0) { nextContainer = "All containers unloaded"; } // all unloaded
+        else { nextContainer = containers.remove(); }
+
+        ACLMessage response = msg.createReply();
+        response.setPerformative(ACLMessage.INFORM);
+        response.setOntology("ship-next-container");
+        response.setContent(nextContainer);
+        send(response);
+    }
+
+
+
 
     public String getShipName() { return shipName; }
     public int getArrivalTime() { return arrivalTime; }

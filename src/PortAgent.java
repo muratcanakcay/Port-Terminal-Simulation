@@ -10,10 +10,7 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class PortAgent extends Agent
 {
@@ -28,6 +25,7 @@ public class PortAgent extends Agent
 
     Queue<AID> waitingShips = new PriorityQueue<AID>();
     List<AID> dockedShips = new ArrayList<jade.core.AID>();
+    List<String> incomingShips = new ArrayList<String>();
 
 
     @Override
@@ -72,6 +70,10 @@ public class PortAgent extends Agent
 
                 switch(msg.getOntology())
                 {
+                    case "ship-incoming":
+                        handleIncomingShip(msg);
+                        break;
+
                     case "ship-arrived":
                         handleArrivedShip(msg.getSender());
                         break;
@@ -82,14 +84,30 @@ public class PortAgent extends Agent
         }
     };
 
-    public int getRows() { return rows; }
-    public int getColumns() { return columns; }
-    public int getStackSize() { return stackSize; }
-    public int getNoOfCranes() { return noOfCranes; }
-    public int getNoOfWaitingShips() { return waitingShips.size(); }
+    private void handleIncomingShip(ACLMessage msg)
+    {
+        String[] shipInfo = msg.getContent().split(":");
+        incomingShips.add(msg.getSender().getLocalName() + ":" + shipInfo[0] + ":" + shipInfo[1]);
+        updateGuiIncomingShips();
+    }
+
+    private void updateGuiIncomingShips()
+    {
+        String incomingShipsList = "";
+
+        for (String shipInfo : incomingShips)
+        {
+            String[] shipInfoParts = shipInfo.split(":");
+            incomingShipsList += "Ship Name: " + shipInfoParts[0] + " ----- Destination: " + shipInfoParts[1] + " ----- ArrivalTime: " + shipInfoParts[2] + "\n";
+        }
+
+        AgentUtils.Gui.Send(this, "port-incoming-ships", incomingShipsList);
+    }
 
     private void handleArrivedShip(AID shipAgent)
     {
+        removeFromIncomingShips(shipAgent.getLocalName());
+
         if (dockedShips.size() == dockSize)
         {
             waitingShips.add(shipAgent);
@@ -104,6 +122,26 @@ public class PortAgent extends Agent
             unloaderFactory.createUnloaderAgentFor(shipAgent.getLocalName());
         }
     }
+
+    private void removeFromIncomingShips(String shipName)
+    {
+        int i = 0;
+        for (String shipInfo : incomingShips)
+        {
+            String[] shipInfoParts = shipInfo.split(":");
+            if (Objects.equals(shipInfoParts[0], shipName)) break;
+            ++i;
+        }
+
+        incomingShips.remove(i);
+        updateGuiIncomingShips();
+    }
+
+    public int getRows() { return rows; }
+    public int getColumns() { return columns; }
+    public int getStackSize() { return stackSize; }
+    public int getNoOfCranes() { return noOfCranes; }
+    public int getNoOfWaitingShips() { return waitingShips.size(); }
 
     private void createCraneAgents()
     {

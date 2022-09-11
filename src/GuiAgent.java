@@ -104,12 +104,20 @@ public class GuiAgent extends Agent
                     case "clock-tick":
                         ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(0)).getComponent(0)).setText(msg.getContent());
                         break;
+                    case "port-incoming-ships":
+                        setIncomingShips(msg.getContent());
                 }
             }
 
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void setIncomingShips(String content)
+    {
+        JTextPane incomingShips = guiWindow.getIncomingShips();
+        incomingShips.setText(content);
+    }
 
     private void setShipDocked(ACLMessage msg)
     {
