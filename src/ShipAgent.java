@@ -62,7 +62,7 @@ public class ShipAgent extends Agent
                 {
                     case "port-order-wait":
                         status = ShipStatus.WAITING;
-                        AgentUtils.Gui.Send(myAgent, "ship-waiting", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + destination);
+                        AgentUtils.Gui.Send(myAgent, "ship-waiting", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + destination); // TODO: implement waitingShips GUI panel
                         AgentUtils.Gui.Send(myAgent, "console", "Waiting");
                         break;
                     case "port-order-dock":
@@ -102,7 +102,7 @@ public class ShipAgent extends Agent
             if (timeToArrival != timeToArrivalOld)
             {
                 timeToArrivalOld = timeToArrival;
-                AgentUtils.Gui.Send(myAgent, "console", String.format("Arrival in: %s", timeToArrival));
+                //AgentUtils.Gui.Send(myAgent, "console", String.format("Arrival in: %s", timeToArrival));
             }
 
             if (timeToArrival == 0)

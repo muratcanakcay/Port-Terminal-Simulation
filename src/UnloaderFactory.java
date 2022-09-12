@@ -5,11 +5,13 @@ public class UnloaderFactory
 {
     AgentContainer ac;
     String unloaderType;
+    int columns;
 
-    public UnloaderFactory(AgentContainer _ac, String _unloaderType)
+    public UnloaderFactory(AgentContainer _ac, String _unloaderType, int _columns)
     {
         ac = _ac;
         unloaderType = _unloaderType;
+        columns = _columns;
     }
 
     public AgentController createUnloaderAgentFor(String shipName)
@@ -17,7 +19,7 @@ public class UnloaderFactory
         try
         {
             String unloaderName = "UnloaderFor" + shipName;
-            Object[] UnloaderArgs = {unloaderName, shipName};
+            Object[] UnloaderArgs = {unloaderName, shipName, columns};
             AgentController Unloader = ac.createNewAgent(unloaderName, unloaderType, UnloaderArgs);
             Unloader.start();
             return Unloader;

@@ -49,7 +49,7 @@ public class PortAgent extends Agent
         AgentUtils.Gui.Send(this, "console", "Port created with Rows: " + getRows() + " Columns: " + getColumns() + " StackSize: " + getStackSize() + " noOfCranes: " + getNoOfCranes());
 
         ac = getContainerController();
-        unloaderFactory = new UnloaderFactory(ac, unloaderType);
+        unloaderFactory = new UnloaderFactory(ac, unloaderType, columns);
         createCellAgents();
         createCraneAgents();
 
@@ -102,6 +102,8 @@ public class PortAgent extends Agent
             if (Objects.equals(shipInfoParts[1], destination)) { shipETA = shipInfoParts[2];}
         }
 
+        // TODO: also implement check for waiting ships otherwise waiting ships will not be taken into account and it will be like no ship is going to the destination
+
         response.setContent(shipETA);
         send(response);
     }
@@ -112,6 +114,14 @@ public class PortAgent extends Agent
         incomingShips.add(msg.getSender().getLocalName() + ":" + shipInfo[0] + ":" + shipInfo[1]);
         incomingShips.sort(new SortByETA());
         updateGuiIncomingShips();
+    }
+
+    static class SortByETA implements Comparator<String>
+    {
+        public int compare(String a, String b)
+        {
+            return Integer.parseInt(a.split(":")[2]) - Integer.parseInt(b.split(":")[2]);
+        }
     }
 
     private void updateGuiIncomingShips()
@@ -125,14 +135,6 @@ public class PortAgent extends Agent
         }
 
         AgentUtils.Gui.Send(this, "port-incoming-ships", incomingShipsList);
-    }
-
-    static class SortByETA implements Comparator<String>
-    {
-        public int compare(String a, String b)
-        {
-            return Integer.parseInt(a.split(":")[2]) - Integer.parseInt(b.split(":")[2]);
-        }
     }
 
     private void handleArrivedShip(AID shipAgent)
@@ -180,8 +182,8 @@ public class PortAgent extends Agent
         {
             for (int i = 0; i < noOfCranes; ++i)
             {
-                Object[] CraneArgs = {"Crane0" + i};
-                AgentController Cell = ac.createNewAgent("Crane0" + i, "CraneAgent", CraneArgs);
+                Object[] CraneArgs = {"Crane0" + (i+1)};
+                AgentController Cell = ac.createNewAgent("Crane0" + (i+1), "CraneAgent", CraneArgs);
                 Cell.start();
             }
         }

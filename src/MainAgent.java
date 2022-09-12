@@ -103,7 +103,7 @@ public class MainAgent extends Agent
     private void createShip058() throws StaleProxyException {
         // create 3 sample containers to add to ship
         Queue<String> containerAgents = new PriorityQueue<String>();
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 17; i++)
         {
             String containerName = String.valueOf(randomUUID());
             String destination = "A";
@@ -130,7 +130,7 @@ public class MainAgent extends Agent
         // TODO: implement a method to add a new ship with incremental ship number
         int shipNumber = 7;
         String shipName = "Ship";
-        String arrivalTime = "20";
+        String arrivalTime = "2000";
         String destination = "A";
         shipName += shipNumber < 10 ? "00" : shipNumber < 100 ? "0" : "";
         shipName += shipNumber;

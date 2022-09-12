@@ -5,6 +5,7 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAException;
@@ -19,18 +20,25 @@ import java.util.Objects;
 public abstract class UnloaderAgent extends Agent
 {
     private String name;
+    protected int columns;
     private String currentContainerName;
+    protected String currentCellName;
     private String currentDestination;
     protected AID shipAgent;
     private AID portAgent;
     private final List<AID> cellAgents = new ArrayList<AID>();
-    private final List<String> availableCells = new ArrayList<>();
+    private final List<AID> craneAgents = new ArrayList<AID>();
+    protected final List<String> availableCells = new ArrayList<>();
+    private final List<AID> availableCranes = new ArrayList<>();
+
+
 
     @Override
     protected void setup() {
         Object[] UnloaderArgs = getArguments();
-        name = (String) UnloaderArgs[0];
-        String shipName = (String) UnloaderArgs[1];
+        name = (String)UnloaderArgs[0];
+        String shipName = (String)UnloaderArgs[1];
+        columns = (int) UnloaderArgs[2];
 
         DFAgentDescription[] ships = AgentUtils.searchDFbyName(this, shipName);
 
@@ -52,6 +60,9 @@ public abstract class UnloaderAgent extends Agent
         // agent gets the cellAgents from DF
         DFAgentDescription[] cellAgentDescriptions = AgentUtils.searchDFbyType(this, "CellAgent");
         for (DFAgentDescription cellAgentDescription : cellAgentDescriptions) { cellAgents.add(cellAgentDescription.getName()); }
+        // agent gets the craneAgents from DF
+        DFAgentDescription[] craneAgentDescriptions = AgentUtils.searchDFbyType(this, "CraneAgent");
+        for (DFAgentDescription craneAgentDescription : craneAgentDescriptions) { craneAgents.add(craneAgentDescription.getName()); }
 
         addBehaviour(ReceiveMessages);
         addBehaviour(RequestContainerFromShip);
@@ -120,7 +131,7 @@ public abstract class UnloaderAgent extends Agent
                 String availableCell = accept_proposal.getSender().getName() + ":" + cellScore;
                 availableCells.add(availableCell);
 
-                AgentUtils.Gui.Send(myAgent, "console-error", "Available cell: " + availableCell); // TODO: delete this consoleLog later
+                // AgentUtils.Gui.Send(myAgent, "console-error", "Available cell: " + availableCell); // TODO: this is for debugging, delete this consoleLog later
             };
 
             protected void handleAllResponses(java.util.Vector responses)
@@ -142,6 +153,55 @@ public abstract class UnloaderAgent extends Agent
         AID containerAgent = AgentUtils.searchDFbyName(this, containerName)[0].getName();
         AgentUtils.SendMessage(this, containerAgent, ACLMessage.REQUEST, "unloader-request-destination", "What is your destination?");
     }
+
+    protected void informCrane()
+    {
+        AgentUtils.Gui.Send(this, "console", "Unloading: " + currentContainerName + " from " + shipAgent.getLocalName() + " to " + currentCellName);
+
+       AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
+
+        AgentUtils.Gui.Send(this, "unloader-unloaded-ship", shipAgent.getLocalName()); // update docked ship container count in gui // TODO: move this to crane
+        availableCells.clear();
+        availableCranes.clear();
+        doWait(1000); // simulating new container unloading
+        addBehaviour(RequestContainerFromShip); // TODO: this should actually be called when the current container is finally handed to the crane
+
+    }
+
+    Behaviour sendCFPtoCranes = new TickerBehaviour(this, 100)
+    {
+        @Override
+        public void onTick()
+        {
+            if (!availableCranes.isEmpty())
+            {
+                removeBehaviour(this);
+                informCrane();
+            }
+
+            ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+
+            for (AID craneAgent : craneAgents) {
+                cfp.addReceiver(craneAgent);
+            }
+
+            AgentUtils.Gui.Send(myAgent, "console-error", "Sending CFP to cranes"); // TODO: this is for debugging, delete this consoleLog later
+
+            addBehaviour(new ProposeInitiator(myAgent, cfp)
+            {
+                protected void handleAcceptProposal(ACLMessage accept_proposal)
+                {
+                    availableCranes.add(accept_proposal.getSender());
+                }
+
+                protected void handleAllResponses(java.util.Vector responses)
+                {
+                    removeBehaviour(this);
+                }
+            });
+        }
+    };
+
 
     @Override
     protected void takeDown()

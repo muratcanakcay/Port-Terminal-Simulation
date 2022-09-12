@@ -41,7 +41,7 @@ public class CellAgent extends Agent
         protected ACLMessage prepareResponse(ACLMessage proposal)
         {
             int newContainerDepartureTime = Integer.parseInt(proposal.getContent());
-            AgentUtils.Gui.Send(myAgent, "console", "Received CPF with departureTime : " + newContainerDepartureTime); // TODO: delete this consoleLog later
+            //AgentUtils.Gui.Send(myAgent, "console", "Received CPF with departureTime : " + newContainerDepartureTime); // TODO: this is for debugging, delete this consoleLog later
 
 
             if (containers.size() == stackSize)
@@ -56,7 +56,7 @@ public class CellAgent extends Agent
                 ACLMessage positiveReply = proposal.createReply();
                 positiveReply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 
-                int score = 0; // TODO: calculate score based on existing containers and new container
+                int score = 0; // TODO: calculate score based on existing containers and newContainerDepartureTime
 
                 positiveReply.setContent(String.valueOf(score));
                 return positiveReply;
