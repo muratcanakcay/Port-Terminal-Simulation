@@ -6,6 +6,7 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
@@ -67,8 +68,13 @@ public class CraneAgent extends Agent
         AgentUtils.Gui.Send(this, "console", "Moving: " + containerName + " from " + shipName + " to " + cellName);
         AgentUtils.Gui.Send(this, "crane-moving-container", containerName + "_" + shipName + "_" + cellName + "_" + status.toString());
 
+        DFAgentDescription[] cellAgentDescriptions = AgentUtils.searchDFbyName(this, cellName);
+        if (cellAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
+        AID cell = cellAgentDescriptions[0].getName();
 
-        Thread.sleep(1000);
+        AgentUtils.SendMessage(this, cell, ACLMessage.INFORM, "crane-put-container", containerName);
+
+        Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed());
 
         AgentUtils.Gui.Send(this, "crane-unloaded-ship", shipName); // update docked ship container count in gui
         status = CraneStatus.IDLE;

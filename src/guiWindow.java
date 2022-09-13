@@ -2,14 +2,13 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class guiWindow
 {
     public  JPanel mainPanel;
     private JTextField count;
     private JPanel cellGrid;
+    public JPanel getCellGrid() { return cellGrid; };
     private JButton changeButton; // TODO: this is just for testing. remove later.
     private JLabel Jlabel2;
     private JScrollPane scrollPaneForConsole;
@@ -183,46 +182,5 @@ public class guiWindow
         incomingShipsCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         scrollPaneForIncomingShips.setViewportView(incomingShips);
         scrollPaneForIncomingShips.getPreferredSize();
-
-
-
-//        Component[] cells = cellGrid.getComponents();
-//        // iterate over cells...
-//        int i = 0;
-//        for (Component cellComponent : cells)
-//        {
-//            JPanel cell = ((JPanel)cellComponent);
-//            Component[] stacks = cell.getComponents();
-//
-//            // iterate over stacks...
-//            int j = 0;
-//            for (Component stackComponent : stacks)
-//            {
-//                JTextField stack = ((JTextField)stackComponent);
-//                stack.setText("Test: "+ i + j);
-//                ++j;
-//            }
-//            ++i;
-//        }
-
-        // TODO: Change to behaviour listening from cellAgent and changing Gui accordingly
-        changeButton.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                int r = 1;
-                int c = 2;
-
-                Component[] panels = cellGrid.getComponents();
-                JPanel panel = ((JPanel)panels[r*columns + c]);
-
-                Component[] stacks = panel.getComponents();
-                JTextField stack = ((JTextField)stacks[2]);
-
-                stack.setText("Changed");
-                //stack.setBackground(Color.RED);
-            }
-        });
     }
 }

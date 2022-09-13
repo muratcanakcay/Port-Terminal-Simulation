@@ -122,6 +122,7 @@ public abstract class UnloaderAgent extends Agent
         }
 
         cfp.setContent(shipETA);
+        cfp.setPerformative(ACLMessage.QUERY_IF);
 
         addBehaviour(new ProposeInitiator(this, cfp)
         {

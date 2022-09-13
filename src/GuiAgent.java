@@ -23,6 +23,8 @@ public class GuiAgent extends Agent
     private guiWindow guiWindow;
     private int dockSize;
     private int noOfCranes;
+    private int stackSize;
+    private int columns;
     private boolean clockRunning = true;
 
     @Override
@@ -36,8 +38,8 @@ public class GuiAgent extends Agent
 
         Object[] PortArgs = getArguments();
         int rows = Integer.parseInt((String) PortArgs[0]);
-        int columns = Integer.parseInt((String) PortArgs[1]);
-        int stackSize = Integer.parseInt((String) PortArgs[2]);
+        columns = Integer.parseInt((String) PortArgs[1]);
+        stackSize = Integer.parseInt((String) PortArgs[2]);
         noOfCranes = Integer.parseInt((String) PortArgs[3]);
         dockSize = Integer.parseInt((String)PortArgs[4]);
 
@@ -113,12 +115,31 @@ public class GuiAgent extends Agent
                     case "loader-loaded-ship":
                         updateDockedShip(msg.getContent(), true);
                         break;
+                    case "cell-received-container":
+                        String[] cellNameParts = msg.getSender().getLocalName().split(":");
+                        int cellRow = Integer.parseInt(cellNameParts[1]);
+                        int cellColumn = Integer.parseInt(cellNameParts[2]);
+                        int stackPosition = stackSize - 1 - Integer.parseInt(msg.getContent().split(":")[0]);
+                        String containerName = msg.getContent().split(":")[1];
+                        updateCell(cellRow, cellColumn, stackPosition, containerName);
+                        break;
                 }
             }
 
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void updateCell(int cellRow, int cellColumn, int stackPosition, String containerName)
+    {
+        Component[] cellComponents = guiWindow.getCellGrid().getComponents();
+        JPanel cellPanel = ((JPanel)cellComponents[cellRow * columns + cellColumn]);
+
+        Component[] stackComponents = cellPanel.getComponents();
+        JTextField stackTextField = ((JTextField)stackComponents[stackPosition]);
+
+        stackTextField.setText(containerName);
+    }
 
     private void updateCrane(String craneName, String containerName, String from, String to, String craneStatus)
     {
@@ -137,8 +158,6 @@ public class GuiAgent extends Agent
             }
         }
     }
-
-    //containerName + "_" + shipName + "_" + cellName + "_" + status
 
     private void updateDockedShip(String shipName, boolean increaseContainerCount)
     {
