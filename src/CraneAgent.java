@@ -74,6 +74,7 @@ public class CraneAgent extends Agent
         if (cellAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
         AID cell = cellAgentDescriptions[0].getName();
 
+        // TODO: wait until clock changes 1 tick so container unloading can also be paused
         Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); // simulate time passed to move container
 
         AgentUtils.SendMessage(this, cell, ACLMessage.INFORM, "crane-put-container", containerData);

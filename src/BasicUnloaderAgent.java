@@ -1,8 +1,3 @@
-import classes.AgentUtils;
-import jade.core.AID;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.lang.acl.ACLMessage;
-
 import java.util.Comparator;
 
 public class BasicUnloaderAgent extends UnloaderAgent
@@ -18,15 +13,6 @@ public class BasicUnloaderAgent extends UnloaderAgent
 
         // Find crane to move container
         addBehaviour(sendCFPtoCranes);
-    }
-
-    private void reserveSpaceInCell(String cellName)
-    {
-        DFAgentDescription[] cellAgentDescriptions = AgentUtils.searchDFbyName(this, cellName);
-        if (cellAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
-        AID cell = cellAgentDescriptions[0].getName();
-
-        AgentUtils.SendMessage(this, cell, ACLMessage.INFORM, "unloader-reserve-space", "Unloader informs incoming container");
     }
 
     class SortByPosition implements Comparator<String>

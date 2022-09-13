@@ -69,15 +69,6 @@ public abstract class UnloaderAgent extends Agent
         addBehaviour(RequestContainerFromShip);
     }
 
-    Behaviour RequestContainerFromShip = new OneShotBehaviour(this)
-    {
-        @Override
-        public void action()
-        {
-            AgentUtils.SendMessage(myAgent, shipAgent, ACLMessage.QUERY_IF, "unloader-request-container", "Requesting next container to unload");
-        }
-    };
-
     Behaviour ReceiveMessages = new CyclicBehaviour(this)
     {
         @Override
@@ -113,6 +104,15 @@ public abstract class UnloaderAgent extends Agent
         }
     };
 
+    Behaviour RequestContainerFromShip = new OneShotBehaviour(this)
+    {
+        @Override
+        public void action()
+        {
+            AgentUtils.SendMessage(myAgent, shipAgent, ACLMessage.QUERY_IF, "unloader-request-container", "Requesting next container to unload");
+        }
+    };
+
     private void sendCFPtoCells(String shipETA)
     {
         ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
@@ -145,6 +145,15 @@ public abstract class UnloaderAgent extends Agent
     }
     protected abstract void makeDecision();
 
+    protected void reserveSpaceInCell(String cellName) // TODO: move to the base class UnloaderAgent
+    {
+        DFAgentDescription[] cellAgentDescriptions = AgentUtils.searchDFbyName(this, cellName);
+        if (cellAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
+        AID cell = cellAgentDescriptions[0].getName();
+
+        AgentUtils.SendMessage(this, cell, ACLMessage.INFORM, "unloader-reserve-space", "Unloader informs incoming container");
+    }
+
     private void requestETAofShipToDestination(String destination)
     {
         AgentUtils.SendMessage(this, portAgent, ACLMessage.REQUEST, "unloader-request-shipETA", destination);
@@ -160,7 +169,7 @@ public abstract class UnloaderAgent extends Agent
     {
         //AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
         String  containerData = currentContainerName + ":" + currentDestination  + ":" + currentShipETA;
-                AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-move", containerData + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
+        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-move", containerData + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
 
         // get the next container from the ship
         availableCells.clear();

@@ -23,9 +23,9 @@ public class PortAgent extends Agent
     private int noOfCranes;
     private int dockSize; // no of ships that can dock simultaneously
 
-    Queue<AID> waitingShips = new PriorityQueue<AID>();
-    List<AID> dockedShips = new ArrayList<jade.core.AID>();
-    List<String> incomingShips = new ArrayList<String>();
+    private final Queue<AID> waitingShips = new PriorityQueue<AID>();
+    private final List<AID> dockedShips = new ArrayList<jade.core.AID>();
+    private final List<String> incomingShips = new ArrayList<String>();
 
 
     @Override
@@ -46,7 +46,7 @@ public class PortAgent extends Agent
         addBehaviour(ReceiveMessages);
 
         // informative console log
-        AgentUtils.Gui.Send(this, "console", "Port created with Rows: " + getRows() + " Columns: " + getColumns() + " StackSize: " + getStackSize() + " noOfCranes: " + getNoOfCranes());
+        AgentUtils.Gui.Send(this, "console", "Port created with Rows: " + rows + " Columns: " + columns + " StackSize: " + stackSize + " noOfCranes: " + noOfCranes);
 
         ac = getContainerController();
         unloaderFactory = new UnloaderFactory(ac, unloaderType, columns);
@@ -170,12 +170,6 @@ public class PortAgent extends Agent
         updateGuiIncomingShips();
     }
 
-    public int getRows() { return rows; }
-    public int getColumns() { return columns; }
-    public int getStackSize() { return stackSize; }
-    public int getNoOfCranes() { return noOfCranes; }
-    public int getNoOfWaitingShips() { return waitingShips.size(); }
-
     private void createCraneAgents()
     {
         try
@@ -200,7 +194,7 @@ public class PortAgent extends Agent
             {
                 for (int c = 0; c < columns; ++c)
                 {
-                    Object[] CellArgs = {String.valueOf(r), String.valueOf(c), String.valueOf(getStackSize())};
+                    Object[] CellArgs = {String.valueOf(r), String.valueOf(c), String.valueOf(stackSize)};
                     AgentController Cell = ac.createNewAgent("Cell:" + r + ":" + c, "CellAgent", CellArgs);
                     Cell.start();
                 }

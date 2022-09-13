@@ -86,7 +86,7 @@ public class CellAgent extends Agent
                 ACLMessage positiveReply = proposal.createReply();
                 positiveReply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 
-                int score = 0; // TODO: calculate score based on existing containers and newContainerDepartureTime
+                int score = 0; // TODO: send the shipETAs instead of score and let the loader/unloader calculate score
 
                 positiveReply.setContent(String.valueOf(score));
                 return positiveReply;
