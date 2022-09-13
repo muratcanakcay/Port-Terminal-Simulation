@@ -85,7 +85,7 @@ public abstract class UnloaderAgent extends Agent
                 {
                     case "ship-next-container":
                         currentContainerName = msg.getContent();
-                        if (Objects.equals(currentContainerName, "All containers unloaded")) {  } // TODO: implement agent termination, let port know and thus order ship to leave
+                        if (Objects.equals(currentContainerName, "All containers unloaded")) { concludeUnloadingProcedure(); } // TODO: implement agent termination, let port know and thus order ship to leave
                         else { requestContainerDestination(msg.getContent()); }
                         break;
                     case "container-destination":
@@ -103,6 +103,12 @@ public abstract class UnloaderAgent extends Agent
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void concludeUnloadingProcedure()
+    {
+        AgentUtils.SendMessage(this, portAgent, ACLMessage.INFORM, "unloader-unloading-finished", "Unloading of " + shipAgent.getLocalName() + " is finished");
+        doDelete();
+    }
 
     Behaviour RequestContainerFromShip = new OneShotBehaviour(this)
     {
