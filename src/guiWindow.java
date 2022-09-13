@@ -45,27 +45,18 @@ public class guiWindow
 
     public guiWindow(int rows, int columns, int stackSize, int noOfCranes, int dockSize)
     {
-        simulationTimePanel.setLayout(new GridLayout(1, 7));
+        simulationTimePanel.setLayout(new GridLayout(1, 8));
 
-        // initialize clockPanel
+        // initialize the GUI components
         initializeClockPanel();
-
-        // initialize cellGrid
+        initializeMoveCountPanel("Unload Moves: ");
+        initializeMoveCountPanel("Load Moves: ");
+        initializeMoveCountPanel("Total Moves: ");
         initializeCellGrid(rows, columns, stackSize);
-
-        // initialize craneGrid
         initializeCraneGrid(noOfCranes);
-
-        // initialize dockGrid
         initializeDockGrid(dockSize);
-
-        // initialize console area
         console = initializeScrollPane(scrollPaneForConsole);
-
-        // initialize waiting ships area
         waitingShips = initializeScrollPane(scrollPaneForWaitingShips);
-
-        // initialize incoming ships area
         incomingShips = initializeScrollPane(scrollPaneForIncomingShips);
     }
 
@@ -81,7 +72,8 @@ public class guiWindow
         return textPane;
     }
 
-    private void initializeDockGrid(int dockSize) {
+    private void initializeDockGrid(int dockSize)
+    {
         dockGrid.setLayout(new GridLayout(dockSize + 1, 5)); // first is row for headings
         for (int r = 0; r < dockSize + 1; r++)
         {
@@ -188,4 +180,30 @@ public class guiWindow
         simulationTimePanel.add(clockPanel);
         simulationTimePanel.add(pauseButtonPanel);
     }
+
+    private void initializeMoveCountPanel(String label)
+    {
+        JTextField moveCount = new JTextField();
+        moveCount.setEditable(false);
+        Font boldClockFont = new Font(moveCount.getFont().getName(), Font.BOLD, 16);
+        moveCount.setFont(boldClockFont);
+        moveCount.setBackground(Color.WHITE);
+        moveCount.setText("0");
+        moveCount.setHorizontalAlignment(JTextField.RIGHT);
+
+        JPanel moveCountPanel = new JPanel();
+        moveCountPanel.setLayout(new BorderLayout());
+        moveCountPanel.setBorder(blackLine);
+
+        moveCountPanel.add(moveCount);
+
+        JPanel moveCountLabelPanel = new JPanel();
+        moveCountLabelPanel.setBorder(blackLine);
+        moveCountLabelPanel.setBackground(Color.WHITE);
+        moveCountLabelPanel.add(new Label(label));
+
+        simulationTimePanel.add(moveCountLabelPanel);
+        simulationTimePanel.add(moveCountPanel);
+    }
 }
+
