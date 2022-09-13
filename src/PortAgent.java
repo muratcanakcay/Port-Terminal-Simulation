@@ -15,7 +15,9 @@ import java.util.*;
 public class PortAgent extends Agent
 {
     private String unloaderType = "BasicUnloaderAgent";
+    private String loaderType = "BasicLoaderAgent";
     private UnloaderFactory unloaderFactory;
+    private LoaderFactory loaderFactory;
     private AgentContainer ac;
     private int rows;
     private int columns;
@@ -50,11 +52,14 @@ public class PortAgent extends Agent
 
         ac = getContainerController();
         unloaderFactory = new UnloaderFactory(ac, unloaderType, columns);
+        loaderFactory = new LoaderFactory(ac, loaderType, columns);
         createCellAgents();
         createCraneAgents();
 
         // test unloaderAgent (since there's no Ship002, it will fail and be indicated in red in the console )
         unloaderFactory.createUnloaderAgentFor("Ship002");
+        // test loaderAgent (since there's no Ship003, it will fail and be indicated in red in the console )
+        loaderFactory.createLoaderAgentFor("Ship003", "X");
     }
 
     Behaviour ReceiveMessages = new CyclicBehaviour(this)
@@ -170,7 +175,7 @@ public class PortAgent extends Agent
 
             //create unloader for the docked empty ship
             if (containerCount > 0) { unloaderFactory.createUnloaderAgentFor(shipAgent.getLocalName()); }
-            else {} // loaderFactory.createLoaderAgentFor(shipAgent.getLocalName(), destination)
+            else { loaderFactory.createLoaderAgentFor(shipAgent.getLocalName(), destination); }
         }
     }
 

@@ -17,10 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class UnloaderAgent extends Agent
+public abstract class LoaderAgent extends Agent
 {
     private String name;
     protected int columns;
+    private String destination;
     private String currentContainerName;
     protected String currentCellName;
     private String currentDestination;
@@ -29,22 +30,22 @@ public abstract class UnloaderAgent extends Agent
     private AID portAgent;
     private final List<AID> cellAgents = new ArrayList<AID>();
     private final List<AID> craneAgents = new ArrayList<AID>();
-    protected final List<String> availableCells = new ArrayList<>();
+    protected final List<String> eligibleCells = new ArrayList<>();
     private final List<AID> availableCranes = new ArrayList<>();
-
 
 
     @Override
     protected void setup() {
-        Object[] UnloaderArgs = getArguments();
-        name = (String)UnloaderArgs[0];
-        String shipName = (String)UnloaderArgs[1];
-        columns = (int) UnloaderArgs[2];
+        Object[] LoaderArgs = getArguments();
+        name = (String)LoaderArgs[0];
+        String shipName = (String)LoaderArgs[1];
+        destination = (String)LoaderArgs[2];
+        columns = (int) LoaderArgs[3];
 
         DFAgentDescription[] ships = AgentUtils.searchDFbyName(this, shipName);
 
         // agent registers itself to DF
-        AgentUtils.registerToDF(this, getAID(), "UnloaderAgent", name);
+        AgentUtils.registerToDF(this, getAID(), "LoaderAgent", name);
         AgentUtils.Gui.Send(this, "console", "Agent is registered to DF.");
 
         if (ships.length != 1)
@@ -66,7 +67,7 @@ public abstract class UnloaderAgent extends Agent
         for (DFAgentDescription craneAgentDescription : craneAgentDescriptions) { craneAgents.add(craneAgentDescription.getName()); }
 
         addBehaviour(ReceiveMessages);
-        addBehaviour(RequestContainerFromShip);
+        sendEligibilityCFPtoCells();
     }
 
     Behaviour ReceiveMessages = new CyclicBehaviour(this)
@@ -95,7 +96,7 @@ public abstract class UnloaderAgent extends Agent
                     case "port-shipETA":
                         currentShipETA = Integer.parseInt(msg.getContent());
                         if (currentShipETA < 0) { AgentUtils.Gui.Send(myAgent, "console-error", "There's no ship that will take " + currentContainerName + " to destination " + currentDestination); }
-                        sendCFPtoCells(msg.getContent());
+                        //sendCFPtoCells(msg.getContent());
                         break;
                 }
             }
@@ -119,7 +120,7 @@ public abstract class UnloaderAgent extends Agent
         }
     };
 
-    private void sendCFPtoCells(String shipETA)
+    private void sendEligibilityCFPtoCells()
     {
         ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 
@@ -128,7 +129,7 @@ public abstract class UnloaderAgent extends Agent
             cfp.addReceiver(cellAgent);
         }
 
-        cfp.setContent("");
+        cfp.setContent(destination);
         cfp.setPerformative(ACLMessage.QUERY_IF);
 
         addBehaviour(new ProposeInitiator(this, cfp)
@@ -136,20 +137,20 @@ public abstract class UnloaderAgent extends Agent
             protected void handleAcceptProposal(ACLMessage accept_proposal)
             {
                 String cellContents = accept_proposal.getContent();
-                String availableCell = accept_proposal.getSender().getName() + ":" + cellContents;
-                availableCells.add(availableCell);
+                String eligibleCell = accept_proposal.getSender().getName() + ":" + cellContents;
+                eligibleCells.add(eligibleCell);
 
-                // AgentUtils.Gui.Send(myAgent, "console-error", "Available cell: " + availableCell); // TODO: this is for debugging, delete this consoleLog later
+                AgentUtils.Gui.Send(myAgent, "console-error", "Eligible  cell: " + eligibleCell); // TODO: this is for debugging, delete this consoleLog later
             };
 
             protected void handleAllResponses(java.util.Vector responses)
             {
                 removeBehaviour(this);
-                makeDecision(shipETA);
+                //makeDecision();
             }
         });
     }
-    protected abstract void makeDecision(String shipETA);
+    protected abstract void makeDecision();
 
     protected void reserveSpaceInCell(String cellName) // TODO: move to the base class UnloaderAgent
     {
@@ -178,7 +179,7 @@ public abstract class UnloaderAgent extends Agent
         AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-move", containerData + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
 
         // get the next container from the ship
-        availableCells.clear();
+        eligibleCells.clear();
         availableCranes.clear();
         addBehaviour(RequestContainerFromShip);
     }

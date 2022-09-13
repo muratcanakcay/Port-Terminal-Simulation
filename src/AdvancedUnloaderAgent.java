@@ -1,7 +1,7 @@
 public class AdvancedUnloaderAgent extends UnloaderAgent
 {
     @Override
-    protected void makeDecision()
+    protected void makeDecision(String shipETA)
     {
 
     }

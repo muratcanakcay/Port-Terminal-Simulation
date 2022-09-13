@@ -1,13 +1,13 @@
 import java.util.Comparator;
 
-public class BasicUnloaderAgent extends UnloaderAgent
+public class BasicLoaderAgent extends LoaderAgent
 {
     @Override
-    protected void makeDecision(String shipETA)
+    protected void makeDecision()
     {
-        // BasicUnloader places container to the first available place
-        availableCells.sort(new SortByPosition());
-        currentCellName = availableCells.get(0).split("@")[0];
+        // BasicLoader places container to the first available place
+        eligibleCells.sort(new SortByPosition());
+        currentCellName = eligibleCells.get(0).split("@")[0];
 
         reserveSpaceInCell(currentCellName);
 

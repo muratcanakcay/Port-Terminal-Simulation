@@ -1,6 +1,5 @@
 import classes.AgentUtils;
 import classes.Utils;
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -11,6 +10,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ProposeResponder;
 
+import java.util.Objects;
 import java.util.Stack;
 
 public class CellAgent extends Agent
@@ -20,7 +20,7 @@ public class CellAgent extends Agent
     private int stackSize;
     private int reserved = 0;
     private String cellName;
-    private final Stack<AID> containers = new Stack<AID>();
+    private final Stack<String> containers = new Stack<String>();
 
     @Override
     protected void setup()
@@ -70,38 +70,59 @@ public class CellAgent extends Agent
         //@Override
         protected ACLMessage prepareResponse(ACLMessage proposal)
         {
-            int newContainerDepartureTime = Integer.parseInt(proposal.getContent());
-            //AgentUtils.Gui.Send(myAgent, "console", "Received CPF with departureTime : " + newContainerDepartureTime); // TODO: this is for debugging, delete this consoleLog later
+            String destination = proposal.getContent();
+            String cellContents = "";
 
-
-            if (containers.size() + reserved == stackSize)
+            if (Objects.equals(destination, "")) // CFP coming for a move to storage
             {
-                ACLMessage negativeReply = proposal.createReply();
-                negativeReply.setPerformative(ACLMessage.REJECT_PROPOSAL);
-                negativeReply.setContent("This cell is full");
-                return negativeReply;
+                if (containers.size() + reserved == stackSize) {
+                    ACLMessage negativeReply = proposal.createReply();
+                    negativeReply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+                    negativeReply.setContent("This cell is full");
+                    return negativeReply;
+                } else {
+                    ACLMessage positiveReply = proposal.createReply();
+                    positiveReply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                    positiveReply.setContent(cellContents);
+                    return positiveReply;
+                }
             }
-            else
+            else // CFP coming for a move to ship
             {
-                ACLMessage positiveReply = proposal.createReply();
-                positiveReply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-
-                int score = 0; // TODO: send the shipETAs instead of score and let the loader/unloader calculate score
-
-                positiveReply.setContent(String.valueOf(score));
-                return positiveReply;
+                if (cellContainsContainerTo(destination)) {
+                    ACLMessage positiveReply = proposal.createReply();
+                    positiveReply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                    positiveReply.setContent(cellContents);
+                    return positiveReply;
+                }
+                else
+                {
+                    ACLMessage negativeReply = proposal.createReply();
+                    negativeReply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+                    negativeReply.setContent("This cell does not have any containers headed for " + destination);
+                    return negativeReply;
+                }
             }
         }
     };
+
+    private boolean cellContainsContainerTo(String destination)
+    {
+        for (String containerData : containers)
+        {
+            if (Objects.equals(containerData.split(":")[1], destination)) return true;
+        }
+        return false;
+    }
+
     private void receiveContainer(String containerData)
     {
         String containerName = containerData.split(":")[0];
 
         DFAgentDescription[] containerAgentDescriptions = AgentUtils.searchDFbyName(this, containerName);
         if (containerAgentDescriptions.length != 1) throw new RuntimeException("Error in container!");
-        AID receivedContainer = containerAgentDescriptions[0].getName();
 
-        containers.push(receivedContainer);
+        containers.push(containerData);
         --reserved;
 
         // TODO: send also the destination and pickup time to GUI
