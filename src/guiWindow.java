@@ -16,10 +16,13 @@ public class guiWindow
     private JScrollPane scrollPaneForWaitingShips;
     private JScrollPane scrollPaneForIncomingShips;
     private JPanel craneGrid;
+    public JPanel getCraneGrid()
+    {
+        return craneGrid;
+    }
     private JPanel simulationTimePanel;
     public JPanel getSimulationTimePanel() { return simulationTimePanel; }
     private JPanel dockGrid;
-
     public JPanel getDockGrid()
     {
         return dockGrid;

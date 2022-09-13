@@ -48,8 +48,13 @@ public class CraneAgent extends Agent
                 switch(msg.getOntology())
                 {
                     case "unloader-order-move":
+                        status = CraneStatus.UNLOADING;
                         String[] infoParts = msg.getContent().split("_");
-                        MoveContainer(infoParts[0], infoParts[1], infoParts[2]);
+                        try {
+                            UnloadContainer(infoParts[0], infoParts[1], infoParts[2]);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                         break;
                 }
             }
@@ -58,12 +63,15 @@ public class CraneAgent extends Agent
         }
     };
 
-    private void MoveContainer(String containerName, String shipName, String cellName)
-    {
+    private void UnloadContainer(String containerName, String shipName, String cellName) throws InterruptedException {
         AgentUtils.Gui.Send(this, "console", "Moving: " + containerName + " from " + shipName + " to " + cellName);
+        AgentUtils.Gui.Send(this, "crane-moving-container", containerName + "_" + shipName + "_" + cellName + "_" + status.toString());
 
+
+        Thread.sleep(1000);
 
         AgentUtils.Gui.Send(this, "crane-unloaded-ship", shipName); // update docked ship container count in gui
+        status = CraneStatus.IDLE;
     }
 
     Behaviour respondCfp = new ProposeResponder(this, MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF))
@@ -71,7 +79,7 @@ public class CraneAgent extends Agent
         //@Override
         protected ACLMessage prepareResponse(ACLMessage proposal)
         {
-            AgentUtils.Gui.Send(myAgent, "console", "Received CPF. Status is " + status.toString()); // TODO: this is for debugging, delete this consoleLog later
+            //AgentUtils.Gui.Send(myAgent, "console", "Received CPF. Status is " + status.toString()); // TODO: this is for debugging, delete this consoleLog later
 
             if (status == CraneStatus.IDLE) {
                 ACLMessage positiveReply = proposal.createReply();

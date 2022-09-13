@@ -154,12 +154,12 @@ public abstract class UnloaderAgent extends Agent
         AgentUtils.SendMessage(this, containerAgent, ACLMessage.REQUEST, "unloader-request-destination", "What is your destination?");
     }
 
-    protected void informCrane()
+    protected void operateCrane()
     {
-        AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
-
+        //AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
         AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-move", currentContainerName + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
 
+        // get the next container from the ship
         availableCells.clear();
         availableCranes.clear();
         addBehaviour(RequestContainerFromShip); // TODO: this should actually be called when the current container is finally handed to the crane
@@ -173,7 +173,7 @@ public abstract class UnloaderAgent extends Agent
             if (!availableCranes.isEmpty())
             {
                 removeBehaviour(this);
-                informCrane();
+                operateCrane();
                 return;
             }
 
@@ -185,7 +185,7 @@ public abstract class UnloaderAgent extends Agent
 
             cfp.setPerformative(ACLMessage.QUERY_IF);
 
-            AgentUtils.Gui.Send(myAgent, "console-error", "Sending CFP to cranes"); // TODO: this is for debugging, delete this consoleLog later
+            //AgentUtils.Gui.Send(myAgent, "console-error", "Sending CFP to cranes"); // TODO: this is for debugging, delete this consoleLog later
 
             addBehaviour(new ProposeInitiator(myAgent, cfp)
             {

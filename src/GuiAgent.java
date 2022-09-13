@@ -22,6 +22,7 @@ public class GuiAgent extends Agent
     private DFAgentDescription mainAgent;
     private guiWindow guiWindow;
     private int dockSize;
+    private int noOfCranes;
     private boolean clockRunning = true;
 
     @Override
@@ -37,7 +38,7 @@ public class GuiAgent extends Agent
         int rows = Integer.parseInt((String) PortArgs[0]);
         int columns = Integer.parseInt((String) PortArgs[1]);
         int stackSize = Integer.parseInt((String) PortArgs[2]);
-        int noOfCranes = Integer.parseInt((String) PortArgs[3]);
+        noOfCranes = Integer.parseInt((String) PortArgs[3]);
         dockSize = Integer.parseInt((String)PortArgs[4]);
 
         // Create the GUI Window
@@ -88,12 +89,6 @@ public class GuiAgent extends Agent
                 {
                     case "console":
                         consoleLog(msg.getSender(), msg.getContent(), Color.BLACK, Color.WHITE);
-
-//                        ACLMessage response = msg.createReply();
-//                        response.setPerformative(ACLMessage.INFORM);
-//                        response.setContent("Today it's raining.");
-//                        System.out.println(getAID().getName() + " is sending response message!");
-//                        send(response);
                         break;
                     case "console-error":
                         consoleLog(msg.getSender(), msg.getContent(), Color.RED, Color.WHITE);
@@ -106,7 +101,13 @@ public class GuiAgent extends Agent
                         break;
                     case "port-incoming-ships":
                         setIncomingShips(msg.getContent());
+                        break;
+                    case "crane-moving-container":
+                        String[] craneInfo = msg.getContent().split("_");
+                        updateCrane(msg.getSender().getLocalName(), craneInfo[0], craneInfo[1], craneInfo[2], craneInfo[3]);
+                        break;
                     case "crane-unloaded-ship":
+                        updateCrane(msg.getSender().getLocalName(), "", "", "", "IDLE");
                         updateDockedShip(msg.getContent(), false);
                         break;
                     case "loader-loaded-ship":
@@ -118,6 +119,26 @@ public class GuiAgent extends Agent
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void updateCrane(String craneName, String containerName, String from, String to, String craneStatus)
+    {
+        Component[] craneGridComponents = guiWindow.getCraneGrid().getComponents();
+
+        // find crane's row in dockGrid and update info
+        for (int i = 1; i < noOfCranes + 1; ++i) // skip first row - it's for headers
+        {
+            if (Objects.equals(((JTextField)craneGridComponents[5*i]).getText(), craneName))
+            {
+                ((JTextField)craneGridComponents[5*i + 1]).setText(craneStatus);            // status
+                ((JTextField)craneGridComponents[5*i + 2]).setText(containerName);          // container
+                ((JTextField)craneGridComponents[5*i + 3]).setText(from);                   // from
+                ((JTextField)craneGridComponents[5*i + 4]).setText(to);                     // to
+                break;
+            }
+        }
+    }
+
+    //containerName + "_" + shipName + "_" + cellName + "_" + status
 
     private void updateDockedShip(String shipName, boolean increaseContainerCount)
     {
