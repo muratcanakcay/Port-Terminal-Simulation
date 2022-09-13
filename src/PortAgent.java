@@ -73,13 +73,19 @@ public class PortAgent extends Agent
                     case "ship-incoming":
                         handleIncomingShip(msg);
                         break;
-
                     case "ship-arrived":
                         handleArrivedShip(msg.getSender());
                         break;
-
+                    case "ship-departed":
+                        AID shipAgent = msg.getSender();
+                        dockedShips.remove(shipAgent);
+                        break;
                     case "unloader-request-shipETA":
                         sendShipETAtoUnloader(msg);
+                        break;
+                    case "unloader-unloading-finished":
+                        String shipName = msg.getContent().split(":")[1];
+                        orderShipToDepart(shipName);
                         break;
                 }
             }
@@ -87,6 +93,12 @@ public class PortAgent extends Agent
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void orderShipToDepart(String shipName)
+    {
+        AID shipAgent = AgentUtils.searchDFbyName(this, shipName)[0].getName();
+        AgentUtils.SendMessage(this, shipAgent, ACLMessage.REQUEST, "port-order-depart", "Depart");
+    }
 
     private void sendShipETAtoUnloader(ACLMessage msg)
     {

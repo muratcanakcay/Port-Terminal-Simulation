@@ -7,5 +7,7 @@ public enum ShipStatus
     WAITING,
     DOCKED_FOR_LOADING,
     DOCKED_FOR_UNLOADING,
+    DEPARTING,
     DEPARTED
+
 }

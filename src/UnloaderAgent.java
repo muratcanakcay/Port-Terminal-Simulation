@@ -106,7 +106,7 @@ public abstract class UnloaderAgent extends Agent
 
     private void concludeUnloadingProcedure()
     {
-        AgentUtils.SendMessage(this, portAgent, ACLMessage.INFORM, "unloader-unloading-finished", "Unloading of " + shipAgent.getLocalName() + " is finished");
+        AgentUtils.SendMessage(this, portAgent, ACLMessage.INFORM, "unloader-unloading-finished", "Unloading of :" + shipAgent.getLocalName() + ": is finished");
         doDelete();
     }
 

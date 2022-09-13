@@ -98,6 +98,12 @@ public class GuiAgent extends Agent
                     case "ship-docked":
                         setShipDocked(msg);
                         break;
+                    case "ship-departing":
+                        setShipDeparting(msg);
+                        break;
+                    case "ship-departed":
+                        setShipDeparted(msg);
+                        break;
                     case "clock-tick":
                         ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(0)).getComponent(0)).setText(msg.getContent());
                         break;
@@ -130,6 +136,7 @@ public class GuiAgent extends Agent
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
 
     private void increaseUnloadMovesCount()
     {
@@ -233,6 +240,43 @@ public class GuiAgent extends Agent
                 break;
             }
         }
+    }
+
+    private void setShipDeparting(ACLMessage msg)
+    {
+        String shipName = msg.getSender().getLocalName();
+        Component[] dockGridComponents = guiWindow.getDockGrid().getComponents();
+
+        // find ship's row in dockGrid and update status
+        for (int i = 1; i < dockSize + 1; ++i) // skip first row - it's for headers
+        {
+            if (Objects.equals(((JTextField)dockGridComponents[5*i]).getText(), shipName))
+            {
+                ((JTextField)dockGridComponents[5*i + 1]).setText(msg.getContent());             // status
+                break;
+            }
+        }
+    }
+    private void setShipDeparted(ACLMessage msg)
+    {
+        String shipName = msg.getSender().getLocalName();
+        Component[] dockGridComponents = guiWindow.getDockGrid().getComponents();
+
+        // find ship's row in dockGrid and empty it
+        for (int i = 1; i < dockSize + 1; ++i) // skip first row - it's for headers
+        {
+            if (Objects.equals(((JTextField)dockGridComponents[5*i]).getText(), shipName))
+            {
+                ((JTextField)dockGridComponents[5*i + 0]).setText("");                 // ship name
+                ((JTextField)dockGridComponents[5*i + 1]).setText("");                 // status
+                ((JTextField)dockGridComponents[5*i + 2]).setText("");                 // no of containers
+                ((JTextField)dockGridComponents[5*i + 3]).setText("");                 // arrival time
+                ((JTextField)dockGridComponents[5*i + 4]).setText("");                 // destination
+
+                break;
+            }
+        }
+
     }
 
 

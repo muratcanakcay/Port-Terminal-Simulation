@@ -12,6 +12,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 
+import java.util.Objects;
 import java.util.Queue;
 
 public class ShipAgent extends Agent
@@ -62,14 +63,29 @@ public class ShipAgent extends Agent
                 {
                     case "port-order-wait":
                         status = ShipStatus.WAITING;
-                        AgentUtils.Gui.Send(myAgent, "ship-waiting", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + destination); // TODO: implement waitingShips GUI panel
+                        AgentUtils.Gui.Send(myAgent, "ship-waiting", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + destination);
                         AgentUtils.Gui.Send(myAgent, "console", "Waiting");
                         break;
                     case "port-order-dock":
                         if (containers.size() == 0) {status = ShipStatus.DOCKED_FOR_LOADING;}
                         else {status = ShipStatus.DOCKED_FOR_UNLOADING;}
                         AgentUtils.Gui.Send(myAgent, "ship-docked", status.toString() + ":" + containers.size() + ":" + arrivalTime + ":" + destination);
-                        AgentUtils.Gui.Send(myAgent, "console", "Docked");
+                        AgentUtils.Gui.Send(myAgent, "console", "Docked with " + containers.size() + " containers");
+                        break;
+                    case "port-order-depart":
+                        status = ShipStatus.DEPARTING;
+                        AgentUtils.Gui.Send(myAgent, "ship-departing", status.toString());
+
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        status = ShipStatus.DEPARTED;
+                        AgentUtils.SendMessage(myAgent, portAgent, ACLMessage.INFORM, "ship-departed", "Departed");
+                        AgentUtils.Gui.Send(myAgent, "ship-departed", status.toString());
+                        AgentUtils.Gui.Send(myAgent, "console", "Departed with " + containers.size() + " containers" + (Objects.equals(destination, "mainPort") ? "" : (" to destination " + destination)));
                         break;
                     case "unloader-request-container":
                         sendNextContainerToUnloader(msg);
