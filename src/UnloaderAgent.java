@@ -24,6 +24,7 @@ public abstract class UnloaderAgent extends Agent
     private String currentContainerName;
     protected String currentCellName;
     private String currentDestination;
+    private int currentShipETA;
     protected AID shipAgent;
     private AID portAgent;
     private final List<AID> cellAgents = new ArrayList<AID>();
@@ -101,8 +102,8 @@ public abstract class UnloaderAgent extends Agent
                         requestETAofShipToDestination(currentDestination);
                         break;
                     case "port-shipETA":
-                        int shipETA = Integer.parseInt(msg.getContent());
-                        if (shipETA < 0) { AgentUtils.Gui.Send(myAgent, "console-error", "There's no ship that will take " + currentContainerName + " to destination " + currentDestination); }
+                        currentShipETA = Integer.parseInt(msg.getContent());
+                        if (currentShipETA < 0) { AgentUtils.Gui.Send(myAgent, "console-error", "There's no ship that will take " + currentContainerName + " to destination " + currentDestination); }
                         sendCFPtoCells(msg.getContent());
                         break;
                 }
@@ -158,7 +159,8 @@ public abstract class UnloaderAgent extends Agent
     protected void operateCrane()
     {
         //AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
-        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-move", currentContainerName + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
+        String  containerData = currentContainerName + ":" + currentDestination  + ":" + currentShipETA;
+                AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-move", containerData + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
 
         // get the next container from the ship
         availableCells.clear();

@@ -119,9 +119,9 @@ public class GuiAgent extends Agent
                         String[] cellNameParts = msg.getSender().getLocalName().split(":");
                         int cellRow = Integer.parseInt(cellNameParts[1]);
                         int cellColumn = Integer.parseInt(cellNameParts[2]);
-                        int stackPosition = stackSize - 1 - Integer.parseInt(msg.getContent().split(":")[0]);
-                        String containerName = msg.getContent().split(":")[1];
-                        updateCell(cellRow, cellColumn, stackPosition, containerName);
+                        String containerData = msg.getContent();
+
+                        updateCell(cellRow, cellColumn, containerData);
                         break;
                 }
             }
@@ -130,15 +130,22 @@ public class GuiAgent extends Agent
         }
     };
 
-    private void updateCell(int cellRow, int cellColumn, int stackPosition, String containerName)
+    private void updateCell(int cellRow, int cellColumn, String containerData)
     {
+        String[] containerDataParts = containerData.split(":");
+        int stackPosition = stackSize - 1 - Integer.parseInt(containerDataParts[0]);
+        String containerName = containerDataParts[1];
+        String destination = containerDataParts[2];
+        String pickupTime  = containerDataParts[3];
+
         Component[] cellComponents = guiWindow.getCellGrid().getComponents();
         JPanel cellPanel = ((JPanel)cellComponents[cellRow * columns + cellColumn]);
 
         Component[] stackComponents = cellPanel.getComponents();
         JTextField stackTextField = ((JTextField)stackComponents[stackPosition]);
 
-        stackTextField.setText(containerName);
+        // TODO: would be good to format this so everything lines up in GUI
+        stackTextField.setText(containerName.substring(0, 6) + "... -- Dest: " + destination + " -- shipETA: " + pickupTime);
     }
 
     private void updateCrane(String craneName, String containerName, String from, String to, String craneStatus)

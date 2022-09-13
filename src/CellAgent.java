@@ -52,8 +52,8 @@ public class CellAgent extends Agent
 
                 switch (msg.getOntology()) {
                     case "crane-put-container":
-                        String containerName = msg.getContent();
-                        receiveContainer(containerName);
+                        String containerData = msg.getContent(); // data format: containerName:destination:shipETA
+                        receiveContainer(containerData);
                         break;
                     case "unloader-reserve-space":
                         ++reserved;
@@ -74,7 +74,7 @@ public class CellAgent extends Agent
             //AgentUtils.Gui.Send(myAgent, "console", "Received CPF with departureTime : " + newContainerDepartureTime); // TODO: this is for debugging, delete this consoleLog later
 
 
-            if (containers.size() == stackSize)
+            if (containers.size() + reserved == stackSize)
             {
                 ACLMessage negativeReply = proposal.createReply();
                 negativeReply.setPerformative(ACLMessage.REJECT_PROPOSAL);
@@ -93,8 +93,10 @@ public class CellAgent extends Agent
             }
         }
     };
-    private void receiveContainer(String containerName)
+    private void receiveContainer(String containerData)
     {
+        String containerName = containerData.split(":")[0];
+
         DFAgentDescription[] containerAgentDescriptions = AgentUtils.searchDFbyName(this, containerName);
         if (containerAgentDescriptions.length != 1) throw new RuntimeException("Error in container!");
         AID receivedContainer = containerAgentDescriptions[0].getName();
@@ -103,7 +105,7 @@ public class CellAgent extends Agent
         --reserved;
 
         // TODO: send also the destination and pickup time to GUI
-        AgentUtils.Gui.Send(this, "cell-received-container", (containers.size() - 1) + ":" + containerName);
+        AgentUtils.Gui.Send(this, "cell-received-container", (containers.size() - 1) + ":" + containerData);
     }
 
     @Override

@@ -64,7 +64,9 @@ public class CraneAgent extends Agent
         }
     };
 
-    private void UnloadContainer(String containerName, String shipName, String cellName) throws InterruptedException {
+    private void UnloadContainer(String containerData, String shipName, String cellName) throws InterruptedException
+    {
+        String containerName = containerData.split(":")[0];
         AgentUtils.Gui.Send(this, "console", "Moving: " + containerName + " from " + shipName + " to " + cellName);
         AgentUtils.Gui.Send(this, "crane-moving-container", containerName + "_" + shipName + "_" + cellName + "_" + status.toString());
 
@@ -72,10 +74,9 @@ public class CraneAgent extends Agent
         if (cellAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
         AID cell = cellAgentDescriptions[0].getName();
 
-        AgentUtils.SendMessage(this, cell, ACLMessage.INFORM, "crane-put-container", containerName);
+        Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); // simulate time passed to move container
 
-        Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed());
-
+        AgentUtils.SendMessage(this, cell, ACLMessage.INFORM, "crane-put-container", containerData);
         AgentUtils.Gui.Send(this, "crane-unloaded-ship", shipName); // update docked ship container count in gui
         status = CraneStatus.IDLE;
     }
