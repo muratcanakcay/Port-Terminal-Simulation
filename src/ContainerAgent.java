@@ -23,7 +23,7 @@ public class ContainerAgent extends Agent
 
         // the Agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "ContainerAgent", containerName);
-        AgentUtils.Gui.Send(this, "console", "Agent is registered to DF.");
+        AgentUtils.Gui.Send(this, "console", "Agent is registered to DF. Destination: " + destination);
 
         addBehaviour(ReceiveMessages);
     }

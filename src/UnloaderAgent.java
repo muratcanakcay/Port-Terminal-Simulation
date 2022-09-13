@@ -163,7 +163,7 @@ public abstract class UnloaderAgent extends Agent
         // get the next container from the ship
         availableCells.clear();
         availableCranes.clear();
-        addBehaviour(RequestContainerFromShip); // TODO: this should actually be called when the current container is finally handed to the crane
+        addBehaviour(RequestContainerFromShip);
     }
 
     Behaviour sendCFPtoCranes = new TickerBehaviour(this, 100)

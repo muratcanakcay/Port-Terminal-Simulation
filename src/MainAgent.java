@@ -11,6 +11,7 @@ import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -52,7 +53,10 @@ public class MainAgent extends Agent
 
             // create sample ship : ship058 with 3 containers
             createShip058();
-            createShip007();
+
+            createEmptyShip(7, "A", "2000");
+            createEmptyShip(8, "B", "2000");
+            createEmptyShip(9, "C", "2000");
 
 
         }
@@ -101,12 +105,31 @@ public class MainAgent extends Agent
     };
 
     private void createShip058() throws StaleProxyException {
-        // create 3 sample containers to add to ship
-        Queue<String> containerAgents = new PriorityQueue<String>();
-        for (int i = 0; i < 17; i++)
+        // create sample containers to add to ship
+        Queue<String> containerAgents = new LinkedList<String>();
+
+        for (int i = 0; i < 7; i++)
         {
             String containerName = String.valueOf(randomUUID());
             String destination = "A";
+            AgentController Container = ac.createNewAgent(containerName, "ContainerAgent", new Object[]{containerName, destination});
+            Container.start();
+            containerAgents.add(containerName);
+        }
+
+        for (int i = 0; i < 6; i++)
+        {
+            String containerName = String.valueOf(randomUUID());
+            String destination = "B";
+            AgentController Container = ac.createNewAgent(containerName, "ContainerAgent", new Object[]{containerName, destination});
+            Container.start();
+            containerAgents.add(containerName);
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            String containerName = String.valueOf(randomUUID());
+            String destination = "C";
             AgentController Container = ac.createNewAgent(containerName, "ContainerAgent", new Object[]{containerName, destination});
             Container.start();
             containerAgents.add(containerName);
@@ -123,15 +146,12 @@ public class MainAgent extends Agent
         Ship.start();
     }
 
-    private void createShip007() throws StaleProxyException
+    private void createEmptyShip(int shipNumber, String destination, String arrivalTime) throws StaleProxyException
     {
         Queue<String> containerAgents = new PriorityQueue<String>();
 
         // TODO: implement a method to add a new ship with incremental ship number
-        int shipNumber = 7;
         String shipName = "Ship";
-        String arrivalTime = "2000";
-        String destination = "A";
         shipName += shipNumber < 10 ? "00" : shipNumber < 100 ? "0" : "";
         shipName += shipNumber;
         AgentController Ship = ac.createNewAgent(shipName, "ShipAgent", new Object[]{shipName, arrivalTime, destination, containerAgents});
