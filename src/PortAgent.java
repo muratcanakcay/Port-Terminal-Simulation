@@ -74,7 +74,7 @@ public class PortAgent extends Agent
                         handleIncomingShip(msg);
                         break;
                     case "ship-arrived":
-                        handleArrivedShip(msg.getSender());
+                        handleArrivedShip(msg);
                         break;
                     case "ship-departed":
                         AID shipAgent = msg.getSender();
@@ -149,8 +149,13 @@ public class PortAgent extends Agent
         AgentUtils.Gui.Send(this, "port-incoming-ships", incomingShipsList);
     }
 
-    private void handleArrivedShip(AID shipAgent)
+    private void handleArrivedShip(ACLMessage msg)
     {
+        AID shipAgent = msg.getSender();
+        String[] shipData = msg.getContent().split(":");
+        int containerCount = Integer.parseInt(shipData[0]);
+        String destination = shipData[1];
+
         removeFromIncomingShips(shipAgent.getLocalName());
 
         if (dockedShips.size() == dockSize)
@@ -163,8 +168,9 @@ public class PortAgent extends Agent
             dockedShips.add(shipAgent);
             AgentUtils.SendMessage(this, shipAgent, ACLMessage.INFORM, "port-order-dock", "dock");
 
-            //create unloader for the docked ship
-            unloaderFactory.createUnloaderAgentFor(shipAgent.getLocalName());
+            //create unloader for the docked empty ship
+            if (containerCount > 0) { unloaderFactory.createUnloaderAgentFor(shipAgent.getLocalName()); }
+            else {} // loaderFactory.createLoaderAgentFor(shipAgent.getLocalName(), destination)
         }
     }
 

@@ -136,7 +136,7 @@ public class ShipAgent extends Agent
         public void action()
         {
             // notify port that the ship arrived
-            AgentUtils.SendMessage(myAgent, portAgent, ACLMessage.INFORM, "ship-arrived", "arrived");
+            AgentUtils.SendMessage(myAgent, portAgent, ACLMessage.INFORM, "ship-arrived", containers.size() + ":" + destination);
         }
     };
 

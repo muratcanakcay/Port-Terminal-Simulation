@@ -51,10 +51,10 @@ public class MainAgent extends Agent
             AgentController Port = ac.createNewAgent("PortAgent", "PortAgent", PortArgs);
             Port.start();
 
-            // create sample ship : ship058 with 3 containers
+            // create sample ship : ship058 with 18 containers to A, B and C
             createShip058();
 
-            createEmptyShip(7, "A", "2000");
+            createEmptyShip(7, "A", "25");
             createEmptyShip(8, "B", "2000");
             createEmptyShip(9, "C", "2000");
 
