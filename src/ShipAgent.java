@@ -37,7 +37,7 @@ public class ShipAgent extends Agent
 
         // agent registers itself to DF
         AgentUtils.registerToDF(this, getAID(), "ShipAgent", shipName);
-        AgentUtils.Gui.Send(this, "console", "Agent is registered to DF.");
+        AgentUtils.Gui.Send(this, "console", "Agent is registered to DF. Carrying " + containers.size() + " containers to destination " + destination);
 
         // agent gets the portAgent from DF
         portAgent = AgentUtils.searchDFbyName(this, "PortAgent")[0].getName();
