@@ -1,8 +1,10 @@
 import classes.AgentUtils;
 import classes.CraneStatus;
+import classes.Utils;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
@@ -27,10 +29,44 @@ public class CraneAgent extends Agent
         AgentUtils.registerToDF(this, getAID(), "CraneAgent", craneName);
         AgentUtils.Gui.Send(this, "console", "Agent is registered to DF. Status is: " + status.toString());
 
+        addBehaviour(ReceiveMessages);
         addBehaviour(respondCfp);
     }
 
-    Behaviour respondCfp = new ProposeResponder(this, MessageTemplate.MatchAll())
+    Behaviour ReceiveMessages = new CyclicBehaviour(this)
+    {
+        @Override
+        public void action()
+        {
+            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+            ACLMessage msg = receive(mt);
+
+            if (msg != null)
+            {
+                AgentUtils.Gui.Send(myAgent, "console", "Received message from: " +  msg.getSender().getLocalName() + " : " + msg.getContent());
+
+                switch(msg.getOntology())
+                {
+                    case "unloader-order-move":
+                        String[] infoParts = msg.getContent().split("_");
+                        MoveContainer(infoParts[0], infoParts[1], infoParts[2]);
+                        break;
+                }
+            }
+
+            block(10 / Utils.Clock.GetSimulationSpeed());
+        }
+    };
+
+    private void MoveContainer(String containerName, String shipName, String cellName)
+    {
+        AgentUtils.Gui.Send(this, "console", "Moving: " + containerName + " from " + shipName + " to " + cellName);
+
+
+        AgentUtils.Gui.Send(this, "crane-unloaded-ship", shipName); // update docked ship container count in gui
+    }
+
+    Behaviour respondCfp = new ProposeResponder(this, MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF))
     {
         //@Override
         protected ACLMessage prepareResponse(ACLMessage proposal)

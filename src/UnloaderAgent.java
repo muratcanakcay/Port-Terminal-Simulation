@@ -156,16 +156,13 @@ public abstract class UnloaderAgent extends Agent
 
     protected void informCrane()
     {
-        AgentUtils.Gui.Send(this, "console", "Unloading: " + currentContainerName + " from " + shipAgent.getLocalName() + " to " + currentCellName);
+        AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
 
-       AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
+        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-move", currentContainerName + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
 
-        AgentUtils.Gui.Send(this, "unloader-unloaded-ship", shipAgent.getLocalName()); // update docked ship container count in gui // TODO: move this to crane
         availableCells.clear();
         availableCranes.clear();
-        doWait(1000); // simulating new container unloading
         addBehaviour(RequestContainerFromShip); // TODO: this should actually be called when the current container is finally handed to the crane
-
     }
 
     Behaviour sendCFPtoCranes = new TickerBehaviour(this, 100)
@@ -177,6 +174,7 @@ public abstract class UnloaderAgent extends Agent
             {
                 removeBehaviour(this);
                 informCrane();
+                return;
             }
 
             ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
@@ -184,6 +182,8 @@ public abstract class UnloaderAgent extends Agent
             for (AID craneAgent : craneAgents) {
                 cfp.addReceiver(craneAgent);
             }
+
+            cfp.setPerformative(ACLMessage.QUERY_IF);
 
             AgentUtils.Gui.Send(myAgent, "console-error", "Sending CFP to cranes"); // TODO: this is for debugging, delete this consoleLog later
 

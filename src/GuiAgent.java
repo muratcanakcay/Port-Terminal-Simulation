@@ -106,7 +106,7 @@ public class GuiAgent extends Agent
                         break;
                     case "port-incoming-ships":
                         setIncomingShips(msg.getContent());
-                    case "unloader-unloaded-ship":
+                    case "crane-unloaded-ship":
                         updateDockedShip(msg.getContent(), false);
                         break;
                     case "loader-loaded-ship":
