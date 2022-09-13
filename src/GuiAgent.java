@@ -111,6 +111,7 @@ public class GuiAgent extends Agent
                     case "crane-unloaded-ship":
                         updateCrane(msg.getSender().getLocalName(), "", "", "", "IDLE");
                         updateDockedShip(msg.getContent(), false);
+                        increaseUnloadMovesCount();
                         break;
                     case "loader-loaded-ship":
                         updateDockedShip(msg.getContent(), true);
@@ -129,6 +130,26 @@ public class GuiAgent extends Agent
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void increaseUnloadMovesCount()
+    {
+        int previousCount = Integer.parseInt(((JTextField)((JPanel) guiWindow.getSimulationTimePanel().getComponent(3)).getComponent(0)).getText());
+        ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(3)).getComponent(0)).setText(String.valueOf(++previousCount));
+        increaseTotalMovesCount();
+    }
+
+    private void increaseLoadMovesCount()
+    {
+        int previousCount = Integer.parseInt(((JTextField)((JPanel) guiWindow.getSimulationTimePanel().getComponent(3)).getComponent(0)).getText());
+        ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(3)).getComponent(0)).setText(String.valueOf(++previousCount));
+        increaseTotalMovesCount();
+    }
+
+    private void increaseTotalMovesCount()
+    {
+        int previousCount = Integer.parseInt(((JTextField)((JPanel) guiWindow.getSimulationTimePanel().getComponent(7)).getComponent(0)).getText());
+        ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(7)).getComponent(0)).setText(String.valueOf(++previousCount));
+    }
 
     private void updateCell(int cellRow, int cellColumn, String containerData)
     {
