@@ -6,11 +6,9 @@ import java.awt.*;
 public class guiWindow
 {
     public  JPanel mainPanel;
-    private JTextField count;
     private JPanel cellGrid;
     public JPanel getCellGrid() { return cellGrid; };
     private JButton changeButton; // TODO: this is just for testing. remove later.
-    private JLabel Jlabel2;
     private JScrollPane scrollPaneForConsole;
     private JScrollPane scrollPaneForWaitingShips;
     private JScrollPane scrollPaneForIncomingShips;
@@ -43,64 +41,76 @@ public class guiWindow
     }
     private Button pauseButton = new Button("Pause");
     public Button getPauseButton() { return pauseButton; }
+    private final Border blackLine = BorderFactory.createLineBorder(Color.black);
 
     public guiWindow(int rows, int columns, int stackSize, int noOfCranes, int dockSize)
     {
-        Border blackLine = BorderFactory.createLineBorder(Color.black);
+        simulationTimePanel.setLayout(new GridLayout(1, 7));
 
         // initialize clockPanel
-        simulationTimePanel.setLayout(new GridLayout(1, 2));
-
-
-        JTextField clock = new JTextField();
-        clock.setEditable(false);
-        Font boldClockFont = new Font(clock.getFont().getName(), Font.BOLD, 16);
-        clock.setFont(boldClockFont);
-        clock.setBackground(Color.WHITE);
-//        Insets clockMargin = new Insets(5, 5, 5, 5);
-//        clock.setMargin(clockMargin);
-        clock.setText("0");
-        clock.setHorizontalAlignment(JTextField.RIGHT);
-
-        JPanel clockPanel = new JPanel();
-        clockPanel.setLayout(new BorderLayout());
-        clockPanel.setBorder(blackLine);
-
-        clockPanel.add(clock);
-
-        JPanel pauseButtonPanel = new JPanel();
-        pauseButtonPanel.setBorder(blackLine);
-        pauseButtonPanel.add(pauseButton);
-
-        simulationTimePanel.add(clockPanel);
-        simulationTimePanel.add(pauseButtonPanel);
-
+        initializeClockPanel();
 
         // initialize cellGrid
-        cellGrid.setLayout(new GridLayout(rows, columns));
-        for (int r = 0; r < rows; r++)
-        {
-            for (int c = 0; c < columns; c++)
-            {
-                JPanel cell = new JPanel();
-                cell.setBorder(blackLine);
-                cell.setLayout(new GridLayout(stackSize, 1));
-
-                for (int s = 0; s < stackSize; s++)
-                {
-                    JTextField stack = new JTextField();
-                    stack.setEditable(false);
-                    stack.setBackground(Color.WHITE);
-                    //stack.setText("Test: " + r + c);
-                    stack.setText("Empty");
-                    cell.add(stack);
-                }
-
-                cellGrid.add(cell);
-            }
-        }
+        initializeCellGrid(rows, columns, stackSize);
 
         // initialize craneGrid
+        initializeCraneGrid(noOfCranes);
+
+        // initialize dockGrid
+        initializeDockGrid(dockSize);
+
+        // initialize console area
+        console = initializeScrollPane(scrollPaneForConsole);
+
+        // initialize waiting ships area
+        waitingShips = initializeScrollPane(scrollPaneForWaitingShips);
+
+        // initialize incoming ships area
+        incomingShips = initializeScrollPane(scrollPaneForIncomingShips);
+    }
+
+    private JTextPane initializeScrollPane(JScrollPane scrollPane)
+    {
+        final JTextPane textPane;
+        textPane = new JTextPane();
+        textPane.setMargin(new Insets(20, 10, 55, 10));
+        DefaultCaret consoleCaret = (DefaultCaret) textPane.getCaret();
+        consoleCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        scrollPane.setViewportView(textPane);
+        scrollPane.getPreferredSize();
+        return textPane;
+    }
+
+    private void initializeDockGrid(int dockSize) {
+        dockGrid.setLayout(new GridLayout(dockSize + 1, 5)); // first is row for headings
+        for (int r = 0; r < dockSize + 1; r++)
+        {
+            for (int c = 0; c < 5; c++)
+            {
+                JTextField ship = new JTextField();
+                ship.setEditable(false);
+                if (r == 0)
+                {
+                    Font boldShipTextFont = new Font(ship.getFont().getName(), Font.BOLD, ship.getFont().getSize());
+                    ship.setFont(boldShipTextFont);
+                    if (c==0) ship.setText("Ship Name");
+                    if (c==1) ship.setText("Status");
+                    if (c==2) ship.setText("Containers");
+                    if (c==3) ship.setText("Arrival");
+                    if (c==4) ship.setText("Destination");
+                }
+                else
+                {
+                    ship.setText("");
+                    ship.setBackground(Color.WHITE);
+                }
+
+                dockGrid.add(ship);
+            }
+        }
+    }
+
+    private void initializeCraneGrid(int noOfCranes) {
         craneGrid.setLayout(new GridLayout(noOfCranes + 1, 5)); // first is row for headings
         for (int r = 0; r < noOfCranes + 1; r++)
         {
@@ -128,59 +138,54 @@ public class guiWindow
                 craneGrid.add(crane);
             }
         }
+    }
 
-        // initialize dockGrid
-        dockGrid.setLayout(new GridLayout(dockSize + 1, 5)); // first is row for headings
-        for (int r = 0; r < dockSize + 1; r++)
+    private void initializeCellGrid(int rows, int columns, int stackSize) {
+        cellGrid.setLayout(new GridLayout(rows, columns));
+        for (int r = 0; r < rows; r++)
         {
-            for (int c = 0; c < 5; c++)
+            for (int c = 0; c < columns; c++)
             {
-                JTextField ship = new JTextField();
-                ship.setEditable(false);
-                if (r == 0)
+                JPanel cell = new JPanel();
+                cell.setBorder(blackLine);
+                cell.setLayout(new GridLayout(stackSize, 1));
+
+                for (int s = 0; s < stackSize; s++)
                 {
-                    Font boldShipTextFont = new Font(ship.getFont().getName(), Font.BOLD, ship.getFont().getSize());
-                    ship.setFont(boldShipTextFont);
-                    if (c==0) ship.setText("Ship Name");
-                    if (c==1) ship.setText("Status");
-                    if (c==2) ship.setText("Containers");
-                    if (c==3) ship.setText("Arrival");
-                    if (c==4) ship.setText("Destination");
-                }
-                else
-                {
-                    ship.setText("");
-                    ship.setBackground(Color.WHITE);
+                    JTextField stack = new JTextField();
+                    stack.setEditable(false);
+                    stack.setBackground(Color.WHITE);
+                    //stack.setText("Test: " + r + c);
+                    stack.setText("Empty");
+                    cell.add(stack);
                 }
 
-                dockGrid.add(ship);
+                cellGrid.add(cell);
             }
         }
+    }
 
-        // TODO: create a grid for incoming/waiting ships
+    private void initializeClockPanel()
+    {
+        JTextField clock = new JTextField();
+        clock.setEditable(false);
+        Font boldClockFont = new Font(clock.getFont().getName(), Font.BOLD, 16);
+        clock.setFont(boldClockFont);
+        clock.setBackground(Color.WHITE);
+        clock.setText("0");
+        clock.setHorizontalAlignment(JTextField.RIGHT);
 
-        // initialize console area
-        console = new JTextPane();
-        console.setMargin(new Insets(20, 10, 55, 10));
-        DefaultCaret consoleCaret = (DefaultCaret) console.getCaret();
-        consoleCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        scrollPaneForConsole.setViewportView(console);
-        scrollPaneForConsole.getPreferredSize();
+        JPanel clockPanel = new JPanel();
+        clockPanel.setLayout(new BorderLayout());
+        clockPanel.setBorder(blackLine);
 
-        // initialize waiting ships area
-        waitingShips = new JTextPane();
-        waitingShips.setMargin(new Insets(20, 10, 55, 10));
-        DefaultCaret waitingShipsCaret = (DefaultCaret) waitingShips.getCaret();
-        waitingShipsCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        scrollPaneForWaitingShips.setViewportView(waitingShips);
-        scrollPaneForWaitingShips.getPreferredSize();
+        clockPanel.add(clock);
 
-        // initialize incoming ships area
-        incomingShips = new JTextPane();
-        incomingShips.setMargin(new Insets(20, 10, 55, 10));
-        DefaultCaret incomingShipsCaret = (DefaultCaret) incomingShips.getCaret();
-        incomingShipsCaret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        scrollPaneForIncomingShips.setViewportView(incomingShips);
-        scrollPaneForIncomingShips.getPreferredSize();
+        JPanel pauseButtonPanel = new JPanel();
+        pauseButtonPanel.setBorder(blackLine);
+        pauseButtonPanel.add(pauseButton);
+
+        simulationTimePanel.add(clockPanel);
+        simulationTimePanel.add(pauseButtonPanel);
     }
 }
