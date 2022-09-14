@@ -151,8 +151,8 @@ public class GuiAgent extends Agent
 
     private void increaseLoadMovesCount()
     {
-        int previousCount = Integer.parseInt(((JTextField)((JPanel) guiWindow.getSimulationTimePanel().getComponent(3)).getComponent(0)).getText());
-        ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(3)).getComponent(0)).setText(String.valueOf(++previousCount));
+        int previousCount = Integer.parseInt(((JTextField)((JPanel) guiWindow.getSimulationTimePanel().getComponent(5)).getComponent(0)).getText());
+        ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(5)).getComponent(0)).setText(String.valueOf(++previousCount));
         increaseTotalMovesCount();
     }
 

@@ -181,7 +181,7 @@ public abstract class LoaderAgent extends Agent
 
         // TODO: check if container destination is destination - YES - goes to ship NO - goes to storage
 
-        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "loader-order-move", containerData + "_" +  currentCellName + "_" + shipAgent.getLocalName());
+        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "loader-order-load", containerData + "_" +  currentCellName + "_" + shipAgent.getLocalName());
 
         // get the next container from the ship
         eligibleCells.clear();

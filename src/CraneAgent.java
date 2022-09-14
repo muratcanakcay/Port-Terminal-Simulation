@@ -15,8 +15,9 @@ import jade.proto.ProposeResponder;
 public class CraneAgent extends Agent
 {
     private CraneStatus status = CraneStatus.IDLE;
-    String craneName;
-    AID container = null;
+    private String craneName;
+    private AID container = null;
+    private int currentTime = 0;
 
 
 
@@ -48,7 +49,7 @@ public class CraneAgent extends Agent
 
                 switch(msg.getOntology())
                 {
-                    case "unloader-order-move":
+                    case "unloader-order-unload":
                         status = CraneStatus.UNLOADING;
                         String[] infoParts = msg.getContent().split("_");
                         try {
@@ -57,7 +58,7 @@ public class CraneAgent extends Agent
                             throw new RuntimeException(e);
                         }
                         break;
-                    case "loader-order-move":
+                    case "loader-order-load":
                         status = CraneStatus.LOADING;
                         infoParts = msg.getContent().split("_");
                         try {
@@ -73,8 +74,6 @@ public class CraneAgent extends Agent
         }
     };
 
-
-
     private void UnloadContainer(String containerData, String shipName, String cellName) throws InterruptedException
     {
         String containerName = containerData.split(":")[0];
@@ -85,8 +84,10 @@ public class CraneAgent extends Agent
         if (cellAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
         AID cell = cellAgentDescriptions[0].getName();
 
-        // TODO: wait until clock changes 1 tick so container unloading can also be paused
-        Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); // simulate time passed to move container
+        // pause button functionality for cranes
+        currentTime = Utils.Clock.GetSimulationTime();
+        do { Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); } // simulate time passed to move container
+        while (currentTime == Utils.Clock.GetSimulationTime());
 
         AgentUtils.SendMessage(this, cell, ACLMessage.INFORM, "crane-put-container", containerData);
         AgentUtils.Gui.Send(this, "crane-unloaded-ship", shipName); // update docked ship container count in gui
@@ -103,8 +104,10 @@ public class CraneAgent extends Agent
         if (shipAgentDescriptions.length != 1) throw new RuntimeException("Error in ship!");
         AID shipAgent = shipAgentDescriptions[0].getName();
 
-        // TODO: wait until clock changes 1 tick so container unloading can also be paused
-        Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); // simulate time passed to move container
+        // pause button functionality for cranes
+        currentTime = Utils.Clock.GetSimulationTime();
+        do { Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); } // simulate time passed to move container
+        while (currentTime == Utils.Clock.GetSimulationTime());
 
         AgentUtils.SendMessage(this, shipAgent, ACLMessage.INFORM, "crane-put-container", containerData);
         AgentUtils.Gui.Send(this, "crane-loaded-ship", shipName); // update docked ship container count in gui

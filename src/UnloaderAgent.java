@@ -175,7 +175,7 @@ public abstract class UnloaderAgent extends Agent
     {
         //AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
         String  containerData = currentContainerName + ":" + currentDestination  + ":" + currentShipETA;
-        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-move", containerData + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
+        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-unload", containerData + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
 
         // get the next container from the ship
         availableCells.clear();
