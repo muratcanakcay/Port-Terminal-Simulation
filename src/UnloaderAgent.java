@@ -23,8 +23,8 @@ public abstract class UnloaderAgent extends Agent
     protected int columns;
     private String currentContainerName;
     protected String currentCellName;
-    private String currentDestination;
-    private int currentShipETA;
+    protected String currentDestination;
+    protected int currentShipETA;
     protected AID shipAgent;
     private AID portAgent;
     private final List<AID> cellAgents = new ArrayList<AID>();
@@ -136,8 +136,9 @@ public abstract class UnloaderAgent extends Agent
             protected void handleAcceptProposal(ACLMessage accept_proposal)
             {
                 String cellContents = accept_proposal.getContent();
-                String availableCell = accept_proposal.getSender().getName() + ":" + cellContents;
+                String availableCell = accept_proposal.getSender().getName() + "_" + cellContents;
                 availableCells.add(availableCell);
+                AgentUtils.Gui.Send(myAgent, "console-error", "availableCell--> " + availableCell );
             };
 
             protected void handleAllResponses(java.util.Vector responses)
@@ -175,6 +176,7 @@ public abstract class UnloaderAgent extends Agent
         AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-unload", containerData + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
 
         // get the next container from the ship
+        doWait(750); // TODO: must find the "sweet spot with craneAgent waiting and this waiting for advancedUnloader to be able to work efficiently
         availableCells.clear();
         availableCranes.clear();
         addBehaviour(RequestContainerFromShip);

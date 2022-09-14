@@ -93,7 +93,7 @@ public class CraneAgent extends Agent
 
         // pause button functionality for cranes
         currentTime = Utils.Clock.GetSimulationTime();
-        do { Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); } // simulate time passed to move container
+        do { Thread.sleep(700 / Utils.Clock.GetSimulationSpeed()); } // simulate time passed to move container
         while (currentTime == Utils.Clock.GetSimulationTime());
 
         // inform destination that a container was given to it

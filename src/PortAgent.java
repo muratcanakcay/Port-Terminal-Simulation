@@ -14,7 +14,7 @@ import java.util.*;
 
 public class PortAgent extends Agent
 {
-    private String unloaderType = "BasicUnloaderAgent";
+    private String unloaderType = "AdvancedUnloaderAgent";
     private String loaderType = "BasicLoaderAgent";
     private UnloaderFactory unloaderFactory;
     private LoaderFactory loaderFactory;
