@@ -45,12 +45,13 @@ public class guiWindow
 
     public guiWindow(int rows, int columns, int stackSize, int noOfCranes, int dockSize)
     {
-        simulationTimePanel.setLayout(new GridLayout(1, 8));
+        simulationTimePanel.setLayout(new GridLayout(1, 10));
 
         // initialize the GUI components
         initializeClockPanel();
         initializeMoveCountPanel("Unload Moves: ");
         initializeMoveCountPanel("Load Moves: ");
+        initializeMoveCountPanel("Internal Moves: ");
         initializeMoveCountPanel("Total Moves: ");
         initializeCellGrid(rows, columns, stackSize);
         initializeCraneGrid(noOfCranes);

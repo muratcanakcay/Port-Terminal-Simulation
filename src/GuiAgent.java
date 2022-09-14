@@ -124,6 +124,10 @@ public class GuiAgent extends Agent
                         updateDockedShip(msg.getContent(), true);
                         increaseLoadMovesCount();
                         break;
+                    case "crane-moved-container":
+                        updateCrane(msg.getSender().getLocalName(), "", "", "", "IDLE");
+                        increaseInternalMovesCount();
+                        break;
                     case "cell-received-container":
                     case "cell-removed-container":
                         String[] cellNameParts = msg.getSender().getLocalName().split(":");
@@ -156,10 +160,17 @@ public class GuiAgent extends Agent
         increaseTotalMovesCount();
     }
 
-    private void increaseTotalMovesCount()
+    private void increaseInternalMovesCount()
     {
         int previousCount = Integer.parseInt(((JTextField)((JPanel) guiWindow.getSimulationTimePanel().getComponent(7)).getComponent(0)).getText());
         ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(7)).getComponent(0)).setText(String.valueOf(++previousCount));
+        increaseTotalMovesCount();
+    }
+
+    private void increaseTotalMovesCount()
+    {
+        int previousCount = Integer.parseInt(((JTextField)((JPanel) guiWindow.getSimulationTimePanel().getComponent(9)).getComponent(0)).getText());
+        ((JTextField)((JPanel)guiWindow.getSimulationTimePanel().getComponent(9)).getComponent(0)).setText(String.valueOf(++previousCount));
     }
 
     private void updateCell(int cellRow, int cellColumn, String containerData)

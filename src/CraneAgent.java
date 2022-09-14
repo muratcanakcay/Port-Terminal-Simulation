@@ -16,9 +16,7 @@ public class CraneAgent extends Agent
 {
     private CraneStatus status = CraneStatus.IDLE;
     private String craneName;
-    private AID container = null;
     private int currentTime = 0;
-
 
 
     @Override
@@ -104,6 +102,7 @@ public class CraneAgent extends Agent
         // update docked ship container count in gui
         if (status == CraneStatus.UNLOADING) { AgentUtils.Gui.Send(this, "crane-unloaded-ship", sourceName); }
         else if (status == CraneStatus.LOADING) { AgentUtils.Gui.Send(this, "crane-loaded-ship", destinationName); }
+        else if (status == CraneStatus.MOVING) { AgentUtils.Gui.Send(this, "crane-moved-container", ""); }
 
         status = CraneStatus.IDLE;
     }
