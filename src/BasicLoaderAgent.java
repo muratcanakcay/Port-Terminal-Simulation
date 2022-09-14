@@ -7,6 +7,23 @@ import java.util.Comparator;
 public class BasicLoaderAgent extends LoaderAgent
 {
     @Override
+    protected void decideCellToMoveTo()
+    {
+        // BasicUnloader places container to the first available place
+        availableCells.sort(new SortByPosition());
+        currentDestinationCellName = availableCells.get(0).split("@")[0];
+        reserveSpaceInCell(currentDestinationCellName);
+        String[] containersInCurrentCell = eligibleCells.get(0).split("_");
+        String containerData = containersInCurrentCell[containersInCurrentCell.length - 1];
+        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "loader-order-move", containerData + "_" + currentCellName + "_" + currentDestinationCellName);
+
+        // get the next container from the ship
+        eligibleCells.clear();
+        availableCranes.clear();
+        sendCFPtoCells(destination);
+    }
+
+    @Override
     protected void decideCellToLoadFrom()
     {
         // BasicLoader picks containers from the first eligible cell

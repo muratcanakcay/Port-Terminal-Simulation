@@ -21,9 +21,10 @@ public abstract class LoaderAgent extends Agent
 {
     private String name;
     protected int columns;
-    private String destination;
+    protected String destination;
     private String currentContainerName;
     protected String currentCellName;
+    protected String currentDestinationCellName;
     private String currentDestination;
     private int currentShipETA;
     protected AID shipAgent;
@@ -31,7 +32,8 @@ public abstract class LoaderAgent extends Agent
     private final List<AID> cellAgents = new ArrayList<AID>();
     private final List<AID> craneAgents = new ArrayList<AID>();
     protected final List<String> eligibleCells = new ArrayList<>();
-    private final List<AID> availableCranes = new ArrayList<>();
+    protected final List<String> availableCells = new ArrayList<>();
+    protected final List<AID> availableCranes = new ArrayList<>();
 
 
     @Override
@@ -67,7 +69,7 @@ public abstract class LoaderAgent extends Agent
         for (DFAgentDescription craneAgentDescription : craneAgentDescriptions) { craneAgents.add(craneAgentDescription.getName()); }
 
         addBehaviour(ReceiveMessages);
-        sendEligibilityCFPtoCells();
+        sendCFPtoCells(destination);
     }
 
     Behaviour ReceiveMessages = new CyclicBehaviour(this)
@@ -120,7 +122,7 @@ public abstract class LoaderAgent extends Agent
         }
     };
 
-    private void sendEligibilityCFPtoCells()
+    protected void sendCFPtoCells(String shipDestination)
     {
         ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 
@@ -129,7 +131,7 @@ public abstract class LoaderAgent extends Agent
             cfp.addReceiver(cellAgent);
         }
 
-        cfp.setContent(destination);
+        cfp.setContent(shipDestination);
         cfp.setPerformative(ACLMessage.QUERY_IF);
 
         addBehaviour(new ProposeInitiator(this, cfp)
@@ -137,22 +139,41 @@ public abstract class LoaderAgent extends Agent
             protected void handleAcceptProposal(ACLMessage accept_proposal)
             {
                 String cellContents = accept_proposal.getContent();
-                String eligibleCell = accept_proposal.getSender().getName() + "_" + cellContents;
-                eligibleCells.add(eligibleCell);
+                String repliedCell = accept_proposal.getSender().getName() + "_" + cellContents;
 
-                AgentUtils.Gui.Send(myAgent, "console-error", "Eligible cell: " + eligibleCell); // TODO: this is for debugging, delete this consoleLog later
+                if (Objects.equals(shipDestination, "")) // CFP for available cells to move a container to
+                {
+                    availableCells.add(repliedCell);
+                    AgentUtils.Gui.Send(myAgent, "console-error", "Available cell: " + repliedCell); // TODO: this is for debugging, delete this consoleLog later
+                }
+                else // CFP for eligible cells to pick a container from
+                {
+                    eligibleCells.add(repliedCell);
+                    AgentUtils.Gui.Send(myAgent, "console-error", "Eligible cell: " + repliedCell); // TODO: this is for debugging, delete this consoleLog later
+                }
             };
 
             protected void handleAllResponses(java.util.Vector responses)
             {
                 removeBehaviour(this);
-                decideCellToLoadFrom();
+
+                if (Objects.equals(shipDestination, ""))  // CFP for available cells to move a container to
+                {
+                    decideCellToMoveTo();
+                }
+                else
+                {
+                    decideCellToLoadFrom();
+                }
             }
         });
     }
+
+    protected abstract void decideCellToMoveTo();
+
     protected abstract void decideCellToLoadFrom();
 
-    protected void reserveSpaceInCell(String cellName) // TODO: move to the base class UnloaderAgent
+    protected void reserveSpaceInCell(String cellName)
     {
         DFAgentDescription[] cellAgentDescriptions = AgentUtils.searchDFbyName(this, cellName);
         if (cellAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
@@ -178,15 +199,24 @@ public abstract class LoaderAgent extends Agent
 
         String[] containersInCurrentCell = eligibleCells.get(0).split("_");
         String containerData = containersInCurrentCell[containersInCurrentCell.length - 1];
+        String containerDestination = containerData.split(":")[1];
 
-        // TODO: check if container destination is destination - YES - goes to ship NO - goes to storage
+        // if container destination is shipDestination load to ship, otherwise move in storage
+        if (Objects.equals(containerDestination, destination))
+        {
+            AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "loader-order-load", containerData + "_" + currentCellName + "_" + shipAgent.getLocalName());
 
-        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "loader-order-load", containerData + "_" +  currentCellName + "_" + shipAgent.getLocalName());
-
-        // get the next container from the ship
-        eligibleCells.clear();
-        availableCranes.clear();
-        sendEligibilityCFPtoCells();
+            // get the next container from the ship
+            eligibleCells.clear();
+            availableCranes.clear();
+            sendCFPtoCells(destination);
+        }
+        else
+        {
+            AgentUtils.Gui.Send(this, "console", "sendCFP for availability");
+            sendCFPtoCells("");
+            //AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "loader-order-move", containerData + "_" + currentCellName + "_" + currentDestinationCellName);
+        }
     }
 
     Behaviour sendCFPtoCranes = new TickerBehaviour(this, 100)

@@ -53,7 +53,7 @@ public class CraneAgent extends Agent
                         status = CraneStatus.UNLOADING;
                         String[] infoParts = msg.getContent().split("_");
                         try {
-                            UnloadContainer(infoParts[0], infoParts[1], infoParts[2]);
+                            MoveContainer(infoParts[0], infoParts[1], infoParts[2]);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -62,7 +62,16 @@ public class CraneAgent extends Agent
                         status = CraneStatus.LOADING;
                         infoParts = msg.getContent().split("_");
                         try {
-                            LoadContainer(infoParts[0], infoParts[1], infoParts[2]);
+                            MoveContainer(infoParts[0], infoParts[1], infoParts[2]);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
+                    case "loader-order-move":
+                        status = CraneStatus.MOVING;
+                        infoParts = msg.getContent().split("_");
+                        try {
+                            MoveContainer(infoParts[0], infoParts[1], infoParts[2]);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -73,6 +82,31 @@ public class CraneAgent extends Agent
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void MoveContainer(String containerData, String sourceName, String destinationName) throws InterruptedException
+    {
+        String containerName = containerData.split(":")[0];
+        AgentUtils.Gui.Send(this, "console", "Moving: " + containerName + " from " + sourceName + " to " + destinationName);
+        AgentUtils.Gui.Send(this, "crane-moving-container", containerName + "_" + sourceName + "_" + destinationName + "_" + status.toString());
+
+        DFAgentDescription[] destinationAgentDescriptions = AgentUtils.searchDFbyName(this, destinationName);
+        if (destinationAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
+        AID destinationAgent = destinationAgentDescriptions[0].getName();
+
+        // pause button functionality for cranes
+        currentTime = Utils.Clock.GetSimulationTime();
+        do { Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); } // simulate time passed to move container
+        while (currentTime == Utils.Clock.GetSimulationTime());
+
+        // inform destination that a container was given to it
+        AgentUtils.SendMessage(this, destinationAgent, ACLMessage.INFORM, "crane-put-container", containerData);
+
+        // update docked ship container count in gui
+        if (status == CraneStatus.UNLOADING) { AgentUtils.Gui.Send(this, "crane-unloaded-ship", sourceName); }
+        else if (status == CraneStatus.LOADING) { AgentUtils.Gui.Send(this, "crane-loaded-ship", destinationName); }
+
+        status = CraneStatus.IDLE;
+    }
 
     private void UnloadContainer(String containerData, String shipName, String cellName) throws InterruptedException
     {
