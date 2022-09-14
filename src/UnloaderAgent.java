@@ -85,7 +85,7 @@ public abstract class UnloaderAgent extends Agent
                 {
                     case "ship-next-container":
                         currentContainerName = msg.getContent();
-                        if (Objects.equals(currentContainerName, "All containers unloaded")) { concludeUnloadingProcedure(); } // TODO: implement agent termination, let port know and thus order ship to leave
+                        if (Objects.equals(currentContainerName, "All containers unloaded")) { concludeUnloadingProcedure(); }
                         else { requestContainerDestination(msg.getContent()); }
                         break;
                     case "container-destination":
@@ -138,8 +138,6 @@ public abstract class UnloaderAgent extends Agent
                 String cellContents = accept_proposal.getContent();
                 String availableCell = accept_proposal.getSender().getName() + ":" + cellContents;
                 availableCells.add(availableCell);
-
-                // AgentUtils.Gui.Send(myAgent, "console-error", "Available cell: " + availableCell); // TODO: this is for debugging, delete this consoleLog later
             };
 
             protected void handleAllResponses(java.util.Vector responses)
@@ -151,7 +149,7 @@ public abstract class UnloaderAgent extends Agent
     }
     protected abstract void makeDecision(String shipETA);
 
-    protected void reserveSpaceInCell(String cellName) // TODO: move to the base class UnloaderAgent
+    protected void reserveSpaceInCell(String cellName)
     {
         DFAgentDescription[] cellAgentDescriptions = AgentUtils.searchDFbyName(this, cellName);
         if (cellAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
@@ -173,7 +171,6 @@ public abstract class UnloaderAgent extends Agent
 
     protected void operateCrane()
     {
-        //AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
         String  containerData = currentContainerName + ":" + currentDestination  + ":" + currentShipETA;
         AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-unload", containerData + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
 
@@ -202,8 +199,6 @@ public abstract class UnloaderAgent extends Agent
             }
 
             cfp.setPerformative(ACLMessage.QUERY_IF);
-
-            //AgentUtils.Gui.Send(myAgent, "console-error", "Sending CFP to cranes"); // TODO: this is for debugging, delete this consoleLog later
 
             addBehaviour(new ProposeInitiator(myAgent, cfp)
             {

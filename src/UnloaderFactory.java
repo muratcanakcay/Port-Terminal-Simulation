@@ -14,7 +14,7 @@ public class UnloaderFactory
         columns = _columns;
     }
 
-    public AgentController createUnloaderAgentFor(String shipName)
+    public void createUnloaderAgentFor(String shipName)
     {
         try
         {
@@ -22,12 +22,9 @@ public class UnloaderFactory
             Object[] UnloaderArgs = {unloaderName, shipName, columns};
             AgentController Unloader = ac.createNewAgent(unloaderName, unloaderType, UnloaderArgs);
             Unloader.start();
-            return Unloader;
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-
-        return null;
     }
 }

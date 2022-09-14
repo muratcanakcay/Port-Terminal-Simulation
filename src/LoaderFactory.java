@@ -14,7 +14,7 @@ public class LoaderFactory
         columns = _columns;
     }
 
-    public AgentController createLoaderAgentFor(String shipName, String destination)
+    public void createLoaderAgentFor(String shipName, String destination)
     {
         try
         {
@@ -22,12 +22,9 @@ public class LoaderFactory
             Object[] LoaderArgs = {loaderName, shipName, destination, columns};
             AgentController Loader = ac.createNewAgent(loaderName, loaderType, LoaderArgs);
             Loader.start();
-            return Loader;
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-
-        return null;
     }
 }

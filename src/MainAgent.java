@@ -41,7 +41,7 @@ public class MainAgent extends Agent
             AgentController Gui = ac.createNewAgent("GuiAgent", "GuiAgent", PortArgs);
             Gui.start();
 
-            // wait for Gui to start // TODO: may need more time to start!
+            // wait for Gui to start
             Thread.sleep(3000);
 
             // initialize AgentUtils.Gui for global use
@@ -135,7 +135,6 @@ public class MainAgent extends Agent
             containerAgents.add(containerName);
         }
 
-        // TODO: implement a method to add a new ship with incremental ship number
         int shipNumber = 58;
         String shipName = "Ship";
         String arrivalTime = "5";
@@ -150,7 +149,6 @@ public class MainAgent extends Agent
     {
         Queue<String> containerAgents = new PriorityQueue<String>();
 
-        // TODO: implement a method to add a new ship with incremental ship number
         String shipName = "Ship";
         shipName += shipNumber < 10 ? "00" : shipNumber < 100 ? "0" : "";
         shipName += shipNumber;

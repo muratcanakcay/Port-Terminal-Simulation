@@ -21,7 +21,7 @@ public abstract class LoaderAgent extends Agent
     private String name;
     protected int columns;
     protected String destination;
-    private String currentContainerName;
+    private String currentContainerName = "";
     protected String currentCellName;
     protected AID currentCellAID;
     protected String currentDestinationCellName;
@@ -131,12 +131,10 @@ public abstract class LoaderAgent extends Agent
                 if (Objects.equals(shipDestination, "")) // CFP for available cells to move a container to
                 {
                     availableCells.add(repliedCell);
-                    //AgentUtils.Gui.Send(myAgent, "console-error", "Available cell: " + repliedCell); // TODO: this is for debugging, delete this consoleLog later
                 }
                 else // CFP for eligible cells to pick a container from
                 {
                     eligibleCells.add(repliedCell);
-                    //AgentUtils.Gui.Send(myAgent, "console-error", "Eligible cell: " + repliedCell); // TODO: this is for debugging, delete this consoleLog later
                 }
             };
 
@@ -180,8 +178,6 @@ public abstract class LoaderAgent extends Agent
 
     protected void operateCrane()
     {
-        //AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
-
         String[] containersInCurrentCell = eligibleCells.get(0).split("_");
         String containerData = containersInCurrentCell[containersInCurrentCell.length - 1];
         String containerDestination = containerData.split(":")[1];
@@ -202,7 +198,6 @@ public abstract class LoaderAgent extends Agent
         {
             AgentUtils.Gui.Send(this, "console", "sendCFP for availability");
             sendCFPtoCells("");
-            //AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "loader-order-move", containerData + "_" + currentCellName + "_" + currentDestinationCellName);
         }
     }
 
@@ -225,8 +220,6 @@ public abstract class LoaderAgent extends Agent
             }
 
             cfp.setPerformative(ACLMessage.QUERY_IF);
-
-            //AgentUtils.Gui.Send(myAgent, "console-error", "Sending CFP to cranes"); // TODO: this is for debugging, delete this consoleLog later
 
             addBehaviour(new ProposeInitiator(myAgent, cfp)
             {

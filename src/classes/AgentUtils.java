@@ -35,10 +35,11 @@ public class AgentUtils
         dfd.setName(aid);
 
         ServiceDescription sd = new ServiceDescription();
-        // TODO: check if can be searched just by name or type. So maybe if type or name == null don't set it?
+
         sd.setType(agentType);
         sd.setName(agentName);
         dfd.addServices(sd);
+
         try {
             DFService.register(agent, dfd);
         } catch (FIPAException fe) {

@@ -107,46 +107,6 @@ public class CraneAgent extends Agent
         status = CraneStatus.IDLE;
     }
 
-    private void UnloadContainer(String containerData, String shipName, String cellName) throws InterruptedException
-    {
-        String containerName = containerData.split(":")[0];
-        AgentUtils.Gui.Send(this, "console", "Moving: " + containerName + " from " + shipName + " to " + cellName);
-        AgentUtils.Gui.Send(this, "crane-moving-container", containerName + "_" + shipName + "_" + cellName + "_" + status.toString());
-
-        DFAgentDescription[] cellAgentDescriptions = AgentUtils.searchDFbyName(this, cellName);
-        if (cellAgentDescriptions.length != 1) throw new RuntimeException("Error in cell!");
-        AID cell = cellAgentDescriptions[0].getName();
-
-        // pause button functionality for cranes
-        currentTime = Utils.Clock.GetSimulationTime();
-        do { Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); } // simulate time passed to move container
-        while (currentTime == Utils.Clock.GetSimulationTime());
-
-        AgentUtils.SendMessage(this, cell, ACLMessage.INFORM, "crane-put-container", containerData);
-        AgentUtils.Gui.Send(this, "crane-unloaded-ship", shipName); // update docked ship container count in gui
-        status = CraneStatus.IDLE;
-    }
-
-    private void LoadContainer(String containerData, String cellName, String shipName) throws InterruptedException
-    {
-        String containerName = containerData.split(":")[0];
-        AgentUtils.Gui.Send(this, "console", "Moving: " + containerName + " from " + cellName + " to " + shipName);
-        AgentUtils.Gui.Send(this, "crane-moving-container", containerName + "_" + cellName + "_" + shipName + "_" + status.toString());
-
-        DFAgentDescription[] shipAgentDescriptions = AgentUtils.searchDFbyName(this, shipName);
-        if (shipAgentDescriptions.length != 1) throw new RuntimeException("Error in ship!");
-        AID shipAgent = shipAgentDescriptions[0].getName();
-
-        // pause button functionality for cranes
-        currentTime = Utils.Clock.GetSimulationTime();
-        do { Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); } // simulate time passed to move container
-        while (currentTime == Utils.Clock.GetSimulationTime());
-
-        AgentUtils.SendMessage(this, shipAgent, ACLMessage.INFORM, "crane-put-container", containerData);
-        AgentUtils.Gui.Send(this, "crane-loaded-ship", shipName); // update docked ship container count in gui
-        status = CraneStatus.IDLE;
-    }
-
     Behaviour respondCfp = new ProposeResponder(this, MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF))
     {
         //@Override

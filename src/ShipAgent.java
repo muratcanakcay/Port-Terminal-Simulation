@@ -124,7 +124,7 @@ public class ShipAgent extends Agent
         public void onTick()
         {
             int currentTime = Clock.GetSimulationTime();
-            int timeToArrival = getArrivalTime() - currentTime;
+            int timeToArrival = arrivalTime - currentTime;
 
             if (timeToArrival != timeToArrivalOld)
             {
@@ -163,11 +163,6 @@ public class ShipAgent extends Agent
         response.setContent(nextContainer);
         send(response);
     }
-
-    public String getShipName() { return shipName; }
-    public int getArrivalTime() { return arrivalTime; }
-    public int getDepartureTime() { return departureTime; }
-    public Queue<String> getContainers() { return containers; }
 
     @Override
     protected void takeDown()
