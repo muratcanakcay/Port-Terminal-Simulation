@@ -48,8 +48,8 @@
           <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <label value="CHANGE row 1 col 2 stack 2"/>
-          <text value="CHANGE row 1 col 2 stack 2"/>
+          <label value="Break Crane002"/>
+          <text value="Break Crane002"/>
         </properties>
       </component>
       <scrollpane id="599b" binding="scrollPaneForConsole">

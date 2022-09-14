@@ -5,6 +5,7 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAException;
@@ -18,6 +19,9 @@ public class CraneAgent extends Agent
     private String craneName;
     private int currentTime = 0;
 
+    private String containerName;
+    private String sourceName;
+    private String destinationName;
 
     @Override
     protected void setup()
@@ -74,6 +78,8 @@ public class CraneAgent extends Agent
                             throw new RuntimeException(e);
                         }
                         break;
+                    case "break":
+                        addBehaviour(repairCrane);
                 }
             }
 
@@ -81,9 +87,34 @@ public class CraneAgent extends Agent
         }
     };
 
-    private void MoveContainer(String containerData, String sourceName, String destinationName) throws InterruptedException
+    Behaviour repairCrane = new OneShotBehaviour() {
+        @Override
+        public void action()
+        {
+            CraneStatus prevStatus = status;
+            status = CraneStatus.REPAIRING;
+            AgentUtils.Gui.Send(myAgent, "console-error", "BROKEN! Reparing...");
+            AgentUtils.Gui.Send(myAgent, "crane-repairing", containerName + "_" + sourceName + "_" + destinationName + "_" + status.toString());
+
+            int timeNow = Utils.Clock.GetSimulationTime();
+            do {
+                block(1000);
+            } while (Utils.Clock.GetSimulationTime() < timeNow + 10);
+
+            status = prevStatus;
+            AgentUtils.Gui.Send(myAgent, "console-error", "WORKING!");
+            AgentUtils.Gui.Send(myAgent, "crane-repaired", containerName + "_" + sourceName + "_" + destinationName + "_" + status.toString());
+        }
+    };
+
+
+
+
+    private void MoveContainer(String containerData, String source, String destination) throws InterruptedException
     {
-        String containerName = containerData.split(":")[0];
+        containerName = containerData.split(":")[0];
+        sourceName = source;
+        destinationName = destination;
         AgentUtils.Gui.Send(this, "console", "Moving: " + containerName + " from " + sourceName + " to " + destinationName);
         AgentUtils.Gui.Send(this, "crane-moving-container", containerName + "_" + sourceName + "_" + destinationName + "_" + status.toString());
 
@@ -93,7 +124,7 @@ public class CraneAgent extends Agent
 
         // pause button functionality for cranes
         currentTime = Utils.Clock.GetSimulationTime();
-        do { Thread.sleep(700 / Utils.Clock.GetSimulationSpeed()); } // simulate time passed to move container
+        do { Thread.sleep(650 / Utils.Clock.GetSimulationSpeed()); } // simulate time passed to move container
         while (currentTime == Utils.Clock.GetSimulationTime());
 
         // inform destination that a container was given to it

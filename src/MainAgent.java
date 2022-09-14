@@ -54,9 +54,11 @@ public class MainAgent extends Agent
             // create sample ship : ship058 with 18 containers to A, B and C
             createShip058();
 
-            createEmptyShip(7, "A", "25");
-            createEmptyShip(8, "B", "40");
-            createEmptyShip(9, "C", "60");
+            // A - B - C for basicLoader/advanced + basicUnloader
+            // B-  C - A for basicLoader + advancedUnloader
+            createEmptyShip(7, "B", "25");
+            createEmptyShip(8, "C", "40");
+            createEmptyShip(9, "A", "60");
 
 
         }

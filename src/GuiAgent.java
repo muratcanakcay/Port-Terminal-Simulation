@@ -1,5 +1,6 @@
 import classes.AgentUtils;
 import classes.Utils;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -7,6 +8,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
+
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -20,6 +22,7 @@ import java.util.Objects;
 public class GuiAgent extends Agent
 {
     private DFAgentDescription mainAgent;
+    private Agent guiAgent = this;
     private guiWindow guiWindow;
     private int dockSize;
     private int noOfCranes;
@@ -55,9 +58,21 @@ public class GuiAgent extends Agent
         consoleLog(getAID(), "Started.", Color.BLACK, Color.WHITE);
 
         initializePauseButton(this);
+        JButton changeButton = guiWindow.getChangeButton();
+        changeButton.addActionListener(breakCrane002);
 
         addBehaviour(ReceiveMessages);
     }
+
+    ActionListener breakCrane002 = new ActionListener()
+    {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            AID crane = AgentUtils.searchDFbyName(guiAgent, "Crane02")[0].getName();
+            AgentUtils.SendMessage(guiAgent, crane, ACLMessage.REQUEST, "break", "break");
+        }
+    };
 
     private void initializePauseButton(Agent guiAgent)
     {
@@ -127,6 +142,14 @@ public class GuiAgent extends Agent
                     case "crane-moved-container":
                         updateCrane(msg.getSender().getLocalName(), "", "", "", "IDLE");
                         increaseInternalMovesCount();
+                        break;
+                    case "crane-repairing":
+                        craneInfo = msg.getContent().split("_");
+                        updateCrane(msg.getSender().getLocalName(), craneInfo[0], craneInfo[1], craneInfo[2], craneInfo[3]);
+                        break;
+                    case "crane-repaired":
+                        craneInfo = msg.getContent().split("_");
+                        updateCrane(msg.getSender().getLocalName(), craneInfo[0], craneInfo[1], craneInfo[2], craneInfo[3]);
                         break;
                     case "cell-received-container":
                     case "cell-removed-container":

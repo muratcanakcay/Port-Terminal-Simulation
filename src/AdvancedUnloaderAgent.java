@@ -4,7 +4,7 @@ import java.util.Objects;
 public class AdvancedUnloaderAgent extends UnloaderAgent
 {
     @Override
-    protected void makeDecision(String shipETA)
+    protected void decideCellToMoveTo(String shipETA)
     {
         // AdvancedUnloader tries to place the container in a cell where all of the containers below
         // have a larger shipETA value

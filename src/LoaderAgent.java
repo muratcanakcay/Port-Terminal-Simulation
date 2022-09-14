@@ -25,8 +25,8 @@ public abstract class LoaderAgent extends Agent
     protected String currentCellName;
     protected AID currentCellAID;
     protected String currentDestinationCellName;
-    private String currentDestination;
-    private int currentShipETA;
+    protected String currentDestination;
+    protected int currentShipETA;
     protected AID shipAgent;
     private AID portAgent;
     private final List<AID> cellAgents = new ArrayList<AID>();
@@ -190,6 +190,7 @@ public abstract class LoaderAgent extends Agent
             AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "loader-order-load", containerData + "_" + currentCellName + "_" + shipAgent.getLocalName());
 
             // get the next container from the ship
+            doWait(750);
             eligibleCells.clear();
             availableCranes.clear();
             sendCFPtoCells(destination);

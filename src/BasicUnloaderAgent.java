@@ -3,7 +3,7 @@ import java.util.Comparator;
 public class BasicUnloaderAgent extends UnloaderAgent
 {
     @Override
-    protected void makeDecision(String shipETA)
+    protected void decideCellToMoveTo(String shipETA)
     {
         // BasicUnloader places container to the first available place
         availableCells.sort(new SortByPosition());

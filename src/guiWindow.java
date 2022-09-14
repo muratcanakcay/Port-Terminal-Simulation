@@ -2,13 +2,16 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class guiWindow
 {
     public  JPanel mainPanel;
     private JPanel cellGrid;
     public JPanel getCellGrid() { return cellGrid; };
-    private JButton changeButton; // TODO: this is just for testing. remove later.
+    private JButton changeButton;
+    public JButton getChangeButton() {return changeButton;};
     private JScrollPane scrollPaneForConsole;
     private JScrollPane scrollPaneForWaitingShips;
     private JScrollPane scrollPaneForIncomingShips;
@@ -59,7 +62,11 @@ public class guiWindow
         console = initializeScrollPane(scrollPaneForConsole);
         waitingShips = initializeScrollPane(scrollPaneForWaitingShips);
         incomingShips = initializeScrollPane(scrollPaneForIncomingShips);
+
+
     }
+
+
 
     private JTextPane initializeScrollPane(JScrollPane scrollPane)
     {

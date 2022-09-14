@@ -144,11 +144,11 @@ public abstract class UnloaderAgent extends Agent
             protected void handleAllResponses(java.util.Vector responses)
             {
                 removeBehaviour(this);
-                makeDecision(shipETA);
+                decideCellToMoveTo(shipETA);
             }
         });
     }
-    protected abstract void makeDecision(String shipETA);
+    protected abstract void decideCellToMoveTo(String shipETA);
 
     protected void reserveSpaceInCell(String cellName)
     {
