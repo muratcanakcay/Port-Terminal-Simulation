@@ -137,20 +137,20 @@ public abstract class LoaderAgent extends Agent
             protected void handleAcceptProposal(ACLMessage accept_proposal)
             {
                 String cellContents = accept_proposal.getContent();
-                String eligibleCell = accept_proposal.getSender().getName() + ":" + cellContents;
+                String eligibleCell = accept_proposal.getSender().getName() + "_" + cellContents;
                 eligibleCells.add(eligibleCell);
 
-                AgentUtils.Gui.Send(myAgent, "console-error", "Eligible  cell: " + eligibleCell); // TODO: this is for debugging, delete this consoleLog later
+                AgentUtils.Gui.Send(myAgent, "console-error", "Eligible cell: " + eligibleCell); // TODO: this is for debugging, delete this consoleLog later
             };
 
             protected void handleAllResponses(java.util.Vector responses)
             {
                 removeBehaviour(this);
-                //makeDecision();
+                decideCellToLoadFrom();
             }
         });
     }
-    protected abstract void makeDecision();
+    protected abstract void decideCellToLoadFrom();
 
     protected void reserveSpaceInCell(String cellName) // TODO: move to the base class UnloaderAgent
     {
@@ -175,13 +175,18 @@ public abstract class LoaderAgent extends Agent
     protected void operateCrane()
     {
         //AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
-        String  containerData = currentContainerName + ":" + currentDestination  + ":" + currentShipETA;
-        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "unloader-order-move", containerData + "_" + shipAgent.getLocalName()  + "_" +  currentCellName);
+
+        String[] containersInCurrentCell = eligibleCells.get(0).split("_");
+        String containerData = containersInCurrentCell[containersInCurrentCell.length - 1];
+
+        // TODO: check if container destination is destination - YES - goes to ship NO - goes to storage
+
+        AgentUtils.SendMessage(this, availableCranes.get(0), ACLMessage.REQUEST, "loader-order-move", containerData + "_" +  currentCellName + "_" + shipAgent.getLocalName());
 
         // get the next container from the ship
         eligibleCells.clear();
         availableCranes.clear();
-        addBehaviour(RequestContainerFromShip);
+        sendEligibilityCFPtoCells();
     }
 
     Behaviour sendCFPtoCranes = new TickerBehaviour(this, 100)

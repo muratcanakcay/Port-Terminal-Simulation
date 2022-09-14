@@ -90,12 +90,23 @@ public class ShipAgent extends Agent
                     case "unloader-request-container":
                         sendNextContainerToUnloader(msg);
                         break;
+                    case "crane-put-container":
+                        String containerData = msg.getContent();
+                        receiveContainer(containerData);
+                        break;
                 }
             }
 
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+    private void receiveContainer(String containerData)
+    {
+        String containerName = containerData.split(":")[0];
+        containers.add(containerName);
+        AgentUtils.Gui.Send(this, "console-error", "Received " + containerData);
+    }
 
     Behaviour NotifyPortOfIncoming = new OneShotBehaviour(this)
     {

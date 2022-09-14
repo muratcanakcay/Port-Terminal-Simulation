@@ -119,10 +119,13 @@ public class GuiAgent extends Agent
                         updateDockedShip(msg.getContent(), false);
                         increaseUnloadMovesCount();
                         break;
-                    case "loader-loaded-ship":
+                    case "crane-loaded-ship":
+                        updateCrane(msg.getSender().getLocalName(), "", "", "", "IDLE");
                         updateDockedShip(msg.getContent(), true);
+                        increaseLoadMovesCount();
                         break;
                     case "cell-received-container":
+                    case "cell-removed-container":
                         String[] cellNameParts = msg.getSender().getLocalName().split(":");
                         int cellRow = Integer.parseInt(cellNameParts[1]);
                         int cellColumn = Integer.parseInt(cellNameParts[2]);
@@ -130,6 +133,7 @@ public class GuiAgent extends Agent
 
                         updateCell(cellRow, cellColumn, containerData);
                         break;
+
                 }
             }
 
@@ -162,15 +166,22 @@ public class GuiAgent extends Agent
     {
         String[] containerDataParts = containerData.split(":");
         int stackPosition = stackSize - 1 - Integer.parseInt(containerDataParts[0]);
-        String containerName = containerDataParts[1];
-        String destination = containerDataParts[2];
-        String pickupTime  = containerDataParts[3];
 
         Component[] cellComponents = guiWindow.getCellGrid().getComponents();
         JPanel cellPanel = ((JPanel)cellComponents[cellRow * columns + cellColumn]);
 
         Component[] stackComponents = cellPanel.getComponents();
         JTextField stackTextField = ((JTextField)stackComponents[stackPosition]);
+
+        if (containerDataParts.length == 1)
+        {
+            stackTextField.setText("Empty");
+            return;
+        }
+
+        String containerName = containerDataParts[1];
+        String destination = containerDataParts[2];
+        String pickupTime  = containerDataParts[3];
 
         // TODO: would be good to format this so everything lines up in GUI
         stackTextField.setText(containerName.substring(0, 6) + "... -- Dest: " + destination + " -- shipETA: " + pickupTime);

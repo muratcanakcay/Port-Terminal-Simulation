@@ -58,6 +58,9 @@ public class CellAgent extends Agent
                     case "unloader-reserve-space":
                         ++reserved;
                         break;
+                    case "loader-request-container":
+                        removeContainer();
+                        break;
                 }
             }
 
@@ -65,13 +68,20 @@ public class CellAgent extends Agent
         }
     };
 
+
+
     Behaviour respondCfp = new ProposeResponder(this, MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF))
     {
         //@Override
         protected ACLMessage prepareResponse(ACLMessage proposal)
         {
             String destination = proposal.getContent();
-            String cellContents = "";
+            StringBuilder cellContents = new StringBuilder();
+
+            for (String containerData : containers)
+            {
+                cellContents.append(containerData).append("_");
+            }
 
             if (Objects.equals(destination, "")) // CFP coming for a move to storage
             {
@@ -83,7 +93,7 @@ public class CellAgent extends Agent
                 } else {
                     ACLMessage positiveReply = proposal.createReply();
                     positiveReply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-                    positiveReply.setContent(cellContents);
+                    positiveReply.setContent(cellContents.toString());
                     return positiveReply;
                 }
             }
@@ -92,7 +102,7 @@ public class CellAgent extends Agent
                 if (cellContainsContainerTo(destination)) {
                     ACLMessage positiveReply = proposal.createReply();
                     positiveReply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-                    positiveReply.setContent(cellContents);
+                    positiveReply.setContent(cellContents.toString());
                     return positiveReply;
                 }
                 else
@@ -125,8 +135,13 @@ public class CellAgent extends Agent
         containers.push(containerData);
         --reserved;
 
-        // TODO: send also the destination and pickup time to GUI
         AgentUtils.Gui.Send(this, "cell-received-container", (containers.size() - 1) + ":" + containerData);
+    }
+
+    private void removeContainer()
+    {
+        String containerData = containers.pop();
+        AgentUtils.Gui.Send(this, "cell-removed-container", String.valueOf(containers.size()));
     }
 
     @Override

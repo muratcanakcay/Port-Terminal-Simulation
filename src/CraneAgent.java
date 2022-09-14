@@ -57,12 +57,23 @@ public class CraneAgent extends Agent
                             throw new RuntimeException(e);
                         }
                         break;
+                    case "loader-order-move":
+                        status = CraneStatus.LOADING;
+                        infoParts = msg.getContent().split("_");
+                        try {
+                            LoadContainer(infoParts[0], infoParts[1], infoParts[2]);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        break;
                 }
             }
 
             block(10 / Utils.Clock.GetSimulationSpeed());
         }
     };
+
+
 
     private void UnloadContainer(String containerData, String shipName, String cellName) throws InterruptedException
     {
@@ -79,6 +90,24 @@ public class CraneAgent extends Agent
 
         AgentUtils.SendMessage(this, cell, ACLMessage.INFORM, "crane-put-container", containerData);
         AgentUtils.Gui.Send(this, "crane-unloaded-ship", shipName); // update docked ship container count in gui
+        status = CraneStatus.IDLE;
+    }
+
+    private void LoadContainer(String containerData, String cellName, String shipName) throws InterruptedException
+    {
+        String containerName = containerData.split(":")[0];
+        AgentUtils.Gui.Send(this, "console", "Moving: " + containerName + " from " + cellName + " to " + shipName);
+        AgentUtils.Gui.Send(this, "crane-moving-container", containerName + "_" + cellName + "_" + shipName + "_" + status.toString());
+
+        DFAgentDescription[] shipAgentDescriptions = AgentUtils.searchDFbyName(this, shipName);
+        if (shipAgentDescriptions.length != 1) throw new RuntimeException("Error in ship!");
+        AID shipAgent = shipAgentDescriptions[0].getName();
+
+        // TODO: wait until clock changes 1 tick so container unloading can also be paused
+        Thread.sleep(1000 / Utils.Clock.GetSimulationSpeed()); // simulate time passed to move container
+
+        AgentUtils.SendMessage(this, shipAgent, ACLMessage.INFORM, "crane-put-container", containerData);
+        AgentUtils.Gui.Send(this, "crane-loaded-ship", shipName); // update docked ship container count in gui
         status = CraneStatus.IDLE;
     }
 
