@@ -4,7 +4,6 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -24,6 +23,7 @@ public abstract class LoaderAgent extends Agent
     protected String destination;
     private String currentContainerName;
     protected String currentCellName;
+    protected AID currentCellAID;
     protected String currentDestinationCellName;
     private String currentDestination;
     private int currentShipETA;
@@ -86,11 +86,6 @@ public abstract class LoaderAgent extends Agent
 
                 switch(msg.getOntology())
                 {
-                    case "ship-next-container":
-                        currentContainerName = msg.getContent();
-                        if (Objects.equals(currentContainerName, "All containers unloaded")) { concludeUnloadingProcedure(); } // TODO: implement agent termination, let port know and thus order ship to leave
-                        else { requestContainerDestination(msg.getContent()); }
-                        break;
                     case "container-destination":
                         currentDestination = msg.getContent();
                         requestETAofShipToDestination(currentDestination);
@@ -107,20 +102,12 @@ public abstract class LoaderAgent extends Agent
         }
     };
 
-    private void concludeUnloadingProcedure()
+    private void concludeLoadingProcedure()
     {
-        AgentUtils.SendMessage(this, portAgent, ACLMessage.INFORM, "unloader-unloading-finished", "Unloading of :" + shipAgent.getLocalName() + ": is finished");
+        doWait(6000);
+        AgentUtils.SendMessage(this, portAgent, ACLMessage.INFORM, "loader-loading-finished", "Loading of :" + shipAgent.getLocalName() + ": is finished");
         doDelete();
     }
-
-    Behaviour RequestContainerFromShip = new OneShotBehaviour(this)
-    {
-        @Override
-        public void action()
-        {
-            AgentUtils.SendMessage(myAgent, shipAgent, ACLMessage.QUERY_IF, "unloader-request-container", "Requesting next container to unload");
-        }
-    };
 
     protected void sendCFPtoCells(String shipDestination)
     {
@@ -144,12 +131,12 @@ public abstract class LoaderAgent extends Agent
                 if (Objects.equals(shipDestination, "")) // CFP for available cells to move a container to
                 {
                     availableCells.add(repliedCell);
-                    AgentUtils.Gui.Send(myAgent, "console-error", "Available cell: " + repliedCell); // TODO: this is for debugging, delete this consoleLog later
+                    //AgentUtils.Gui.Send(myAgent, "console-error", "Available cell: " + repliedCell); // TODO: this is for debugging, delete this consoleLog later
                 }
                 else // CFP for eligible cells to pick a container from
                 {
                     eligibleCells.add(repliedCell);
-                    AgentUtils.Gui.Send(myAgent, "console-error", "Eligible cell: " + repliedCell); // TODO: this is for debugging, delete this consoleLog later
+                    //AgentUtils.Gui.Send(myAgent, "console-error", "Eligible cell: " + repliedCell); // TODO: this is for debugging, delete this consoleLog later
                 }
             };
 
@@ -163,7 +150,11 @@ public abstract class LoaderAgent extends Agent
                 }
                 else
                 {
-                    decideCellToLoadFrom();
+                    // if there are no cells containing containers headed for destination, inform port and terminate
+                    if (eligibleCells.isEmpty())
+                    { concludeLoadingProcedure(); }
+                    else
+                    { decideCellToLoadFrom(); }
                 }
             }
         });
@@ -187,12 +178,6 @@ public abstract class LoaderAgent extends Agent
         AgentUtils.SendMessage(this, portAgent, ACLMessage.REQUEST, "unloader-request-shipETA", destination);
     }
 
-    private void requestContainerDestination(String containerName)
-    {
-        AID containerAgent = AgentUtils.searchDFbyName(this, containerName)[0].getName();
-        AgentUtils.SendMessage(this, containerAgent, ACLMessage.REQUEST, "unloader-request-destination", "What is your destination?");
-    }
-
     protected void operateCrane()
     {
         //AgentUtils.Gui.Send(this, "console-error", "Available crane: " + availableCranes.get(0).getLocalName()); // TODO: this is for debugging, delete this consoleLog later
@@ -200,6 +185,8 @@ public abstract class LoaderAgent extends Agent
         String[] containersInCurrentCell = eligibleCells.get(0).split("_");
         String containerData = containersInCurrentCell[containersInCurrentCell.length - 1];
         String containerDestination = containerData.split(":")[1];
+
+        AgentUtils.SendMessage(this, currentCellAID, ACLMessage.INFORM, "loader-request-container", "Requesting next container to load");
 
         // if container destination is shipDestination load to ship, otherwise move in storage
         if (Objects.equals(containerDestination, destination))

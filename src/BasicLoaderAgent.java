@@ -1,5 +1,4 @@
 import classes.AgentUtils;
-import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
 import java.util.Comparator;
@@ -9,7 +8,7 @@ public class BasicLoaderAgent extends LoaderAgent
     @Override
     protected void decideCellToMoveTo()
     {
-        // BasicUnloader places container to the first available place
+        // BasicLoader places container to the first available place
         availableCells.sort(new SortByPosition());
         currentDestinationCellName = availableCells.get(0).split("@")[0];
         reserveSpaceInCell(currentDestinationCellName);
@@ -29,10 +28,9 @@ public class BasicLoaderAgent extends LoaderAgent
         // BasicLoader picks containers from the first eligible cell
         eligibleCells.sort(new SortByPosition());
         currentCellName = eligibleCells.get(0).split("@")[0];
-        AID currentCellAID = AgentUtils.searchDFbyName(this, currentCellName)[0].getName();
+        currentCellAID = AgentUtils.searchDFbyName(this, currentCellName)[0].getName();
 
         AgentUtils.Gui.Send(this, "console", "decided to load from " + currentCellName);
-        AgentUtils.SendMessage(this, currentCellAID, ACLMessage.INFORM, "loader-request-container", "Requesting next container to load");
 
         // Find crane to move container
         addBehaviour(sendCFPtoCranes);

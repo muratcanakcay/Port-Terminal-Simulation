@@ -89,6 +89,7 @@ public class PortAgent extends Agent
                         sendShipETAtoUnloader(msg);
                         break;
                     case "unloader-unloading-finished":
+                    case "loader-loading-finished":
                         String shipName = msg.getContent().split(":")[1];
                         orderShipToDepart(shipName);
                         break;

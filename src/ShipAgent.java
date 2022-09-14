@@ -77,7 +77,7 @@ public class ShipAgent extends Agent
                         AgentUtils.Gui.Send(myAgent, "ship-departing", status.toString());
 
                         try {
-                            Thread.sleep(3000);
+                            Thread.sleep(2000);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -105,7 +105,7 @@ public class ShipAgent extends Agent
     {
         String containerName = containerData.split(":")[0];
         containers.add(containerName);
-        AgentUtils.Gui.Send(this, "console-error", "Received " + containerData);
+        AgentUtils.Gui.Send(this, "console", "Received container: " + containerData);
     }
 
     Behaviour NotifyPortOfIncoming = new OneShotBehaviour(this)

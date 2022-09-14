@@ -55,8 +55,8 @@ public class MainAgent extends Agent
             createShip058();
 
             createEmptyShip(7, "A", "25");
-            createEmptyShip(8, "B", "2000");
-            createEmptyShip(9, "C", "2000");
+            createEmptyShip(8, "B", "40");
+            createEmptyShip(9, "C", "60");
 
 
         }
